@@ -155,15 +155,21 @@ const DashboardView = () => {
     if (!activeWins.length) return { current: 0, longest: 0 };
     
     // Sort wins by date
-    const sortedWins = [...activeWins].sort((a, b) => 
-      new Date(a.date).getTime() - new Date(b.date).getTime()
-    );
+    const sortedWins = [...activeWins].sort((a, b) => {
+      // Ensure we have valid dates
+      const dateA = a.date instanceof Date && !isNaN(a.date.getTime()) ? a.date : new Date();
+      const dateB = b.date instanceof Date && !isNaN(b.date.getTime()) ? b.date : new Date();
+      return dateA.getTime() - dateB.getTime();
+    });
     
     // Group wins by date
     const winsByDate: Record<string, boolean> = {};
     sortedWins.forEach(win => {
-      const dateStr = new Date(win.date).toISOString().split('T')[0];
-      winsByDate[dateStr] = true;
+      // Only process valid dates
+      if (win.date instanceof Date && !isNaN(win.date.getTime())) {
+        const dateStr = win.date.toISOString().split('T')[0];
+        winsByDate[dateStr] = true;
+      }
     });
     
     // Calculate current streak
@@ -297,9 +303,15 @@ const DashboardView = () => {
   const streakTimelineRange = useMemo(() => {
     if (!activeWins.length) return { start: 'Feb 19', end: 'May 19' };
     
-    const dates = activeWins.map(win => new Date(win.date));
-    const oldestDate = new Date(Math.min(...dates.map(d => d.getTime())));
-    const newestDate = new Date(Math.max(...dates.map(d => d.getTime())));
+    // Filter out invalid dates
+    const validDates = activeWins
+      .map(win => win.date)
+      .filter(date => date instanceof Date && !isNaN(date.getTime()));
+    
+    if (validDates.length === 0) return { start: 'Feb 19', end: 'May 19' };
+    
+    const oldestDate = new Date(Math.min(...validDates.map(d => d.getTime())));
+    const newestDate = new Date(Math.max(...validDates.map(d => d.getTime())));
     
     // Format dates
     const formatDate = (date: Date) => {
