@@ -87,7 +87,7 @@ export function WinItem({ win, toggleFavorite, toggleArchive, viewSummary, isMob
             </div>
           )}
         </CardContent>
-        <CardFooter className="flex flex-wrap pt-0 gap-2 justify-between">
+        <CardFooter className="flex flex-wrap pt-0 gap-2 justify-start">
           <Button 
             variant="ghost" 
             size="sm" 
