@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
-import { Heart, Archive, Eye, ChevronDown, ChevronUp } from 'lucide-react';
+import { Heart, Eye, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { TableRow, TableCell } from '@/components/ui/table';
 import { Win } from './types';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
 
 interface WinItemProps {
   win: Win;
@@ -153,14 +152,6 @@ export function WinItem({ win, toggleFavorite, toggleArchive, viewSummary, isMob
             className={win.isFavorite ? "text-red-500" : ""}
           >
             <Heart className="h-4 w-4" />
-          </Button>
-          
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={() => toggleArchive(win.id)}
-          >
-            <Archive className="h-4 w-4" />
           </Button>
           
           <Button 
