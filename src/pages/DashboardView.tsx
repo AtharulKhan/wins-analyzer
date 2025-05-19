@@ -1,5 +1,5 @@
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,14 +11,87 @@ import {
 import { BarChart as BarChartIcon, Calendar, Star, TrendingUp } from 'lucide-react';
 import { StatsCard } from '@/components/ui/StatsCard';
 import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
-import { WinsTracker } from '@/components/wins/WinsTracker';
 import { useLocalStorage } from '@/hooks/use-local-storage';
+
+interface Win {
+  id: string;
+  title: string;
+  category: string;
+  date: Date;
+  link: string;
+  desc: string;
+}
 
 const DashboardView = () => {
   const { toast } = useToast();
-  const [wins] = useLocalStorage('wins-data', []);
+  const [apiKey] = useLocalStorage('google-sheets-api-key', '');
+  const [sheetId] = useLocalStorage('google-sheets-id', '1zx957CNpMus2IOY17j0TIt5yopSWs1v3AkAf7TSnExw');
+  const [range] = useLocalStorage('google-sheets-range', 'Master!A2:E');
+  
+  const [wins, setWins] = useState<Win[]>([]);
+  const [loading, setLoading] = useState(false);
   const [favorites] = useLocalStorage('win-favorites', [] as string[]);
   const [archived] = useLocalStorage('win-archived', [] as string[]);
+
+  // Fetch data from Google Sheets
+  const fetchData = async () => {
+    if (!apiKey) {
+      toast({
+        title: "API Key Not Set",
+        description: "Please go to Settings and enter your Google Sheets API key.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (data.values && data.values.length) {
+        const parsedWins: Win[] = data.values.map((row: string[], index: number) => {
+          const [title, category, dateStr, link, desc] = row;
+          const id = `win-${index}-${dateStr}`;
+          return {
+            id,
+            title: title || 'Untitled',
+            category: category || 'Uncategorized',
+            date: dateStr ? new Date(dateStr) : new Date(),
+            link: link || '',
+            desc: desc || '',
+          };
+        });
+        
+        setWins(parsedWins);
+      } else {
+        toast({
+          title: "No data found",
+          description: "Your sheet is empty or the range doesn't contain data.",
+          variant: "default"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Failed to load data",
+        description: error instanceof Error ? error.message : "An unknown error occurred.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  useEffect(() => {
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [apiKey, sheetId, range]);
 
   // Filter out archived wins
   const activeWins = useMemo(() => {
