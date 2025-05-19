@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { Heart, Archive, Eye, ChevronDown, ChevronUp } from 'lucide-react';
@@ -45,8 +46,8 @@ export function WinItem({ win, toggleFavorite, toggleArchive, viewSummary, isMob
           </div>
         </CardHeader>
         <CardContent className="pb-2">
-          <div className="text-sm text-muted-foreground mb-1 break-words">
-            <span>{win.platform} • {timeAgo}</span>
+          <div className="text-sm text-muted-foreground mb-1 break-words max-w-full overflow-visible">
+            {win.platform} • {timeAgo}
           </div>
           {subCategoriesArray.length > 0 && (
             <div className="mt-2 w-full">
