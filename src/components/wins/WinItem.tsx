@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { Heart, Archive, Eye, ChevronDown, ChevronUp } from 'lucide-react';
@@ -34,7 +33,7 @@ export function WinItem({ win, toggleFavorite, toggleArchive, viewSummary, isMob
   
   if (isMobile) {
     return (
-      <Card className="mb-4 mx-1 overflow-hidden w-[calc(100%-8px)]">
+      <Card className="mb-4 mx-1 w-full">
         <CardHeader className="pb-2">
           <CardTitle className="text-md font-medium">
             <span className="block truncate max-w-full">{win.title}</span>
