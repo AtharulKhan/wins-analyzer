@@ -36,12 +36,14 @@ export function WinItem({ win, toggleFavorite, toggleArchive, viewSummary, isMob
     return (
       <Card className="mb-4 mx-2">
         <CardHeader className="pb-2">
-          <CardTitle className="text-md font-medium flex items-center justify-between">
-            <span className="truncate max-w-[180px]">{win.title}</span>
-            <Badge variant={win.isFavorite ? "default" : "outline"} className="ml-2 shrink-0">
+          <CardTitle className="text-md font-medium">
+            <span className="block truncate max-w-full">{win.title}</span>
+          </CardTitle>
+          <div className="mt-1">
+            <Badge variant={win.isFavorite ? "default" : "outline"} className="shrink-0">
               {win.category}
             </Badge>
-          </CardTitle>
+          </div>
         </CardHeader>
         <CardContent className="pb-2">
           <div className="text-sm text-muted-foreground mb-1">

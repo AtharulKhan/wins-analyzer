@@ -30,7 +30,7 @@ export function WinsList({
   isMobile = false
 }: WinsListProps) {
   return (
-    <Card className={isMobile ? "mx-2" : ""}>
+    <Card className={isMobile ? "mx-4" : ""}>
       <CardContent className="p-0">
         {groupBy === 'none' ? (
           <Table>
