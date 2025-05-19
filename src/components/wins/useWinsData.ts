@@ -2,7 +2,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useLocalStorage } from '@/hooks/use-local-storage';
-import { Win, GOOGLE_SHEETS_API_KEY, GOOGLE_SHEETS_ID, GOOGLE_SHEETS_RANGE } from './types';
+import { Win, SortOption, GOOGLE_SHEETS_API_KEY, GOOGLE_SHEETS_ID, GOOGLE_SHEETS_RANGE } from './types';
 
 export function useWinsData() {
   const { toast } = useToast();
@@ -16,7 +16,7 @@ export function useWinsData() {
   const [dateRange, setDateRange] = useState({ preset: 'all', from: null, to: null });
   const [favorites, setFavorites] = useLocalStorage('win-favorites', [] as string[]);
   const [archived, setArchived] = useLocalStorage('win-archived', [] as string[]);
-  const [sortBy, setSortBy] = useState({ key: 'date', order: 'desc' });
+  const [sortBy, setSortBy] = useState<SortOption>({ key: 'date', order: 'desc' });
   const [groupBy, setGroupBy] = useState('none');
   const [selectedSummary, setSelectedSummary] = useState<string | null>(null);
 
@@ -198,7 +198,10 @@ export function useWinsData() {
       });
     } else if (groupBy === 'subCategory') {
       sortedWins.forEach(win => {
-        const subCategories = win.subCategories.split(',').map(sc => sc.trim());
+        const subCategories = typeof win.subCategories === 'string'
+          ? win.subCategories.split(',').map(sc => sc.trim())
+          : [];
+          
         if (subCategories.length === 0 || (subCategories.length === 1 && !subCategories[0])) {
           // Handle empty subCategories
           if (!grouped['Uncategorized']) {
@@ -222,7 +225,7 @@ export function useWinsData() {
         }
         grouped[platform].push(win);
       });
-    } else if (groupBy === 'month') {
+    } else if (groupBy === 'date' || groupBy === 'month') {
       sortedWins.forEach(win => {
         const monthYear = win.date.toLocaleString('default', { month: 'long', year: 'numeric' });
         if (!grouped[monthYear]) {

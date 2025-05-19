@@ -19,13 +19,20 @@ interface WinItemProps {
 export function WinItem({ win, toggleFavorite, toggleArchive, viewSummary, isMobile = false }: WinItemProps) {
   const timeAgo = formatDistanceToNow(new Date(win.date), { addSuffix: true });
   
+  // Convert subCategories string to array if needed
+  const subCategoriesArray = typeof win.subCategories === 'string' 
+    ? win.subCategories.split(',').map(sc => sc.trim()).filter(Boolean) 
+    : Array.isArray(win.subCategories) 
+      ? win.subCategories 
+      : [];
+  
   if (isMobile) {
     return (
       <Card className="mb-4">
         <CardHeader className="pb-2">
           <CardTitle className="text-md font-medium flex items-center justify-between">
             <span className="truncate">{win.title}</span>
-            <Badge variant={win.favorite ? "default" : "outline"}>
+            <Badge variant={win.isFavorite ? "default" : "outline"}>
               {win.category}
             </Badge>
           </CardTitle>
@@ -34,9 +41,9 @@ export function WinItem({ win, toggleFavorite, toggleArchive, viewSummary, isMob
           <div className="text-sm text-muted-foreground mb-1">
             <span>{win.platform} • {timeAgo}</span>
           </div>
-          {win.subCategories.length > 0 && (
+          {subCategoriesArray.length > 0 && (
             <div className="flex flex-wrap gap-1 mt-2">
-              {win.subCategories.map(subCategory => (
+              {subCategoriesArray.map(subCategory => (
                 <Badge key={subCategory} variant="secondary" className="text-xs">
                   {subCategory}
                 </Badge>
@@ -49,10 +56,10 @@ export function WinItem({ win, toggleFavorite, toggleArchive, viewSummary, isMob
             variant="ghost" 
             size="sm" 
             onClick={() => toggleFavorite(win.id)}
-            className={win.favorite ? "text-red-500" : ""}
+            className={win.isFavorite ? "text-red-500" : ""}
           >
             <Heart className="h-4 w-4 mr-1" />
-            {win.favorite ? "Favorited" : "Favorite"}
+            {win.isFavorite ? "Favorited" : "Favorite"}
           </Button>
           
           <Button 
@@ -61,7 +68,7 @@ export function WinItem({ win, toggleFavorite, toggleArchive, viewSummary, isMob
             onClick={() => toggleArchive(win.id)}
           >
             <Archive className="h-4 w-4 mr-1" />
-            {win.archived ? "Archived" : "Archive"}
+            {win.isArchived ? "Archived" : "Archive"}
           </Button>
           
           <Button 
@@ -83,7 +90,7 @@ export function WinItem({ win, toggleFavorite, toggleArchive, viewSummary, isMob
       <TableCell>{win.category}</TableCell>
       <TableCell>
         <div className="flex flex-wrap gap-1">
-          {win.subCategories.map(subCategory => (
+          {subCategoriesArray.map(subCategory => (
             <Badge key={subCategory} variant="secondary" className="text-xs">
               {subCategory}
             </Badge>
@@ -98,7 +105,7 @@ export function WinItem({ win, toggleFavorite, toggleArchive, viewSummary, isMob
             variant="ghost" 
             size="icon" 
             onClick={() => toggleFavorite(win.id)}
-            className={win.favorite ? "text-red-500" : ""}
+            className={win.isFavorite ? "text-red-500" : ""}
           >
             <Heart className="h-4 w-4" />
           </Button>

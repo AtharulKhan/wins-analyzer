@@ -14,21 +14,35 @@ import {
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 
+interface SortOption {
+  key: string;
+  order: string;
+}
+
 interface SortMenuProps {
-  sortBy: string;
-  setSortBy: (value: string) => void;
+  sortBy: SortOption;
+  setSortBy: (value: SortOption) => void;
   groupBy: string;
   setGroupBy: (value: string) => void;
   isMobileDrawer?: boolean;
 }
 
 export function SortMenu({ sortBy, setSortBy, groupBy, setGroupBy, isMobileDrawer = false }: SortMenuProps) {
+  // Helper function to create sort option
+  const createSortOption = (key: string, order: string): SortOption => ({ key, order });
+
+  // Handle sort selection
+  const handleSortSelection = (value: string) => {
+    const [key, order] = value.split('-');
+    setSortBy({ key, order });
+  };
+
   const SortContent = () => (
     <>
       <div className="space-y-4">
         <div>
           <h4 className="mb-2 text-sm font-medium">Sort By</h4>
-          <RadioGroup value={sortBy} onValueChange={setSortBy}>
+          <RadioGroup value={`${sortBy.key}-${sortBy.order}`} onValueChange={handleSortSelection}>
             {[
               { label: 'Most Recent', value: 'date-desc' },
               { label: 'Oldest First', value: 'date-asc' },
@@ -79,7 +93,7 @@ export function SortMenu({ sortBy, setSortBy, groupBy, setGroupBy, isMobileDrawe
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="start">
         <DropdownMenuLabel>Sort By</DropdownMenuLabel>
-        <DropdownMenuRadioGroup value={sortBy} onValueChange={setSortBy}>
+        <DropdownMenuRadioGroup value={`${sortBy.key}-${sortBy.order}`} onValueChange={handleSortSelection}>
           <DropdownMenuRadioItem value="date-desc">Most Recent</DropdownMenuRadioItem>
           <DropdownMenuRadioItem value="date-asc">Oldest First</DropdownMenuRadioItem>
           <DropdownMenuRadioItem value="title-asc">Title (A-Z)</DropdownMenuRadioItem>
