@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
@@ -18,8 +17,9 @@ const Settings = () => {
   
   const handleSave = () => {
     toast({
-      title: "Settings saved",
-      description: "Your Google Sheets API settings have been saved.",
+      title: "Success",
+      description: "Settings saved successfully",
+      variant: "default"
     });
   };
 
@@ -52,13 +52,13 @@ const Settings = () => {
         toast({
           title: "Connection successful!",
           description: `Retrieved ${data.values.length} rows from your sheet.`,
-          variant: "success"
+          variant: "default"
         });
       } else {
         toast({
           title: "Connected, but no data found",
           description: "Your API key works, but the sheet or range might be empty.",
-          variant: "warning"
+          variant: "default"
         });
       }
     } catch (error) {

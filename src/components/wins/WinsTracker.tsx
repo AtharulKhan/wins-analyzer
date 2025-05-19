@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useMemo } from 'react';
 import { Search, Filter, Star, Archive, ExternalLink } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -96,7 +95,7 @@ export function WinsTracker({ view = 'table' }: WinsTrackerProps) {
         toast({
           title: "No data found",
           description: "Your sheet is empty or the range doesn't contain data.",
-          variant: "warning"
+          variant: "default"
         });
       }
     } catch (error) {
