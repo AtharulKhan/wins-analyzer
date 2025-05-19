@@ -38,6 +38,13 @@ export function FilterPopover({
                           platformFilter.length > 0 || 
                           dateRange.preset !== 'all';
 
+  // Helper functions to handle array updates properly
+  const toggleArrayItem = (array: string[], item: string): string[] => {
+    return array.includes(item)
+      ? array.filter(i => i !== item)
+      : [...array, item];
+  };
+
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -60,11 +67,8 @@ export function FilterPopover({
                 size="sm"
                 className="h-7 text-xs"
                 onClick={() => {
-                  setCategoryFilter(prev => 
-                    prev.includes(category) 
-                      ? prev.filter(c => c !== category) 
-                      : [...prev, category]
-                  );
+                  // Fix: Use the new helper function instead of passing a callback
+                  setCategoryFilter(toggleArrayItem(categoryFilter, category));
                 }}
               >
                 {category}
@@ -83,11 +87,8 @@ export function FilterPopover({
                 size="sm"
                 className="h-7 text-xs"
                 onClick={() => {
-                  setSubCategoryFilter(prev => 
-                    prev.includes(subCategory) 
-                      ? prev.filter(c => c !== subCategory) 
-                      : [...prev, subCategory]
-                  );
+                  // Fix: Use the new helper function instead of passing a callback
+                  setSubCategoryFilter(toggleArrayItem(subCategoryFilter, subCategory));
                 }}
               >
                 {subCategory}
@@ -106,11 +107,8 @@ export function FilterPopover({
                 size="sm"
                 className="h-7 text-xs"
                 onClick={() => {
-                  setPlatformFilter(prev => 
-                    prev.includes(platform) 
-                      ? prev.filter(p => p !== platform) 
-                      : [...prev, platform]
-                  );
+                  // Fix: Use the new helper function instead of passing a callback
+                  setPlatformFilter(toggleArrayItem(platformFilter, platform));
                 }}
               >
                 {platform}
