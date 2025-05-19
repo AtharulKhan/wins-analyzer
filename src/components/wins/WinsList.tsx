@@ -30,7 +30,7 @@ export function WinsList({
   isMobile = false
 }: WinsListProps) {
   return (
-    <Card>
+    <Card className={isMobile ? "mx-2" : ""}>
       <CardContent className="p-0">
         {groupBy === 'none' ? (
           <Table>
@@ -54,16 +54,31 @@ export function WinsList({
                   </TableCell>
                 </TableRow>
               ) : (
-                groupedWins.ungrouped.map((win) => (
-                  <WinItem 
-                    key={win.id}
-                    win={win}
-                    toggleFavorite={toggleFavorite}
-                    toggleArchive={toggleArchive}
-                    viewSummary={setSelectedSummary}
-                    isMobile={isMobile}
-                  />
-                ))
+                isMobile ? (
+                  <div className="px-2 py-4">
+                    {groupedWins.ungrouped.map((win) => (
+                      <WinItem 
+                        key={win.id}
+                        win={win}
+                        toggleFavorite={toggleFavorite}
+                        toggleArchive={toggleArchive}
+                        viewSummary={setSelectedSummary}
+                        isMobile={isMobile}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  groupedWins.ungrouped.map((win) => (
+                    <WinItem 
+                      key={win.id}
+                      win={win}
+                      toggleFavorite={toggleFavorite}
+                      toggleArchive={toggleArchive}
+                      viewSummary={setSelectedSummary}
+                      isMobile={isMobile}
+                    />
+                  ))
+                )
               )}
             </TableBody>
           </Table>
@@ -74,20 +89,8 @@ export function WinsList({
                 <div className="p-3 font-medium bg-muted/30">
                   {group}
                 </div>
-                <Table>
-                  {!isMobile && (
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Title</TableHead>
-                        <TableHead>Category</TableHead>
-                        <TableHead>Sub-Categories</TableHead>
-                        <TableHead>Platform</TableHead>
-                        <TableHead>Date</TableHead>
-                        <TableHead className="w-[150px]">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                  )}
-                  <TableBody>
+                {isMobile ? (
+                  <div className="px-2 py-4">
                     {groupWins.map((win) => (
                       <WinItem
                         key={win.id}
@@ -98,8 +101,33 @@ export function WinsList({
                         isMobile={isMobile}
                       />
                     ))}
-                  </TableBody>
-                </Table>
+                  </div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Title</TableHead>
+                        <TableHead>Category</TableHead>
+                        <TableHead>Sub-Categories</TableHead>
+                        <TableHead>Platform</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead className="w-[150px]">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {groupWins.map((win) => (
+                        <WinItem
+                          key={win.id}
+                          win={win}
+                          toggleFavorite={toggleFavorite}
+                          toggleArchive={toggleArchive}
+                          viewSummary={setSelectedSummary}
+                          isMobile={isMobile}
+                        />
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
               </div>
             ))}
           </div>
