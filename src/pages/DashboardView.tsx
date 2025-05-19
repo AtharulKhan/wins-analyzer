@@ -12,6 +12,11 @@ import { StatsCard } from '@/components/ui/StatsCard';
 import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
 import { useLocalStorage } from '@/hooks/use-local-storage';
 
+// Hard-coded Google Sheets API values
+const GOOGLE_SHEETS_API_KEY = 'AIzaSyDsoN29aqbA8yJPVoORiTemvl21ft1zBls';
+const GOOGLE_SHEETS_ID = '1zx957CNpMus2IOY17j0TIt5yopSWs1v3AkAf7TSnExw';
+const GOOGLE_SHEETS_RANGE = 'Master!A2:G';
+
 interface Win {
   id: string;
   title: string;
@@ -23,29 +28,17 @@ interface Win {
 
 const DashboardView = () => {
   const { toast } = useToast();
-  const [apiKey] = useLocalStorage('google-sheets-api-key', '');
-  const [sheetId] = useLocalStorage('google-sheets-id', '1zx957CNpMus2IOY17j0TIt5yopSWs1v3AkAf7TSnExw');
-  const [range] = useLocalStorage('google-sheets-range', 'Master!A2:E');
+  const [favorites] = useLocalStorage('win-favorites', [] as string[]);
+  const [archived] = useLocalStorage('win-archived', [] as string[]);
   
   const [wins, setWins] = useState<Win[]>([]);
   const [loading, setLoading] = useState(false);
-  const [favorites] = useLocalStorage('win-favorites', [] as string[]);
-  const [archived] = useLocalStorage('win-archived', [] as string[]);
 
   // Fetch data from Google Sheets
   const fetchData = async () => {
-    if (!apiKey) {
-      toast({
-        title: "API Key Not Set",
-        description: "Please go to Settings and enter your Google Sheets API key.",
-        variant: "destructive"
-      });
-      return;
-    }
-    
     setLoading(true);
     try {
-      const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
+      const url = `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEETS_ID}/values/${GOOGLE_SHEETS_RANGE}?key=${GOOGLE_SHEETS_API_KEY}`;
       const response = await fetch(url);
       
       if (!response.ok) {
@@ -56,7 +49,7 @@ const DashboardView = () => {
       
       if (data.values && data.values.length) {
         const parsedWins: Win[] = data.values.map((row: string[], index: number) => {
-          const [title, category, dateStr, link, desc] = row;
+          const [title, category, subCategories, summary, platform, dateStr, link] = row;
           const id = `win-${index}-${dateStr}`;
           return {
             id,
@@ -64,7 +57,7 @@ const DashboardView = () => {
             category: category || 'Uncategorized',
             date: dateStr ? new Date(dateStr) : new Date(),
             link: link || '',
-            desc: desc || '',
+            desc: summary || '',
           };
         });
         
@@ -90,7 +83,7 @@ const DashboardView = () => {
   useEffect(() => {
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [apiKey, sheetId, range]);
+  }, []);
 
   // Filter out archived wins
   const activeWins = useMemo(() => {

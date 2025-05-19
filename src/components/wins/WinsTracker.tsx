@@ -1,6 +1,5 @@
-
 import React, { useEffect, useState, useMemo } from 'react';
-import { Search, Filter, Star, Archive, ExternalLink, BarChart, ArrowUp, ArrowDown, List, ListOrdered, FileText } from 'lucide-react';
+import { Search, Filter, Star, Archive, ExternalLink, BarChart, ArrowUp, ArrowDown } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -51,6 +50,11 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
+// Hard-coded Google Sheets API values
+const GOOGLE_SHEETS_API_KEY = 'AIzaSyDsoN29aqbA8yJPVoORiTemvl21ft1zBls';
+const GOOGLE_SHEETS_ID = '1zx957CNpMus2IOY17j0TIt5yopSWs1v3AkAf7TSnExw';
+const GOOGLE_SHEETS_RANGE = 'Master!A2:G';
+
 interface Win {
   id: string;
   title: string;
@@ -70,9 +74,6 @@ interface WinsTrackerProps {
 
 export function WinsTracker({ view = 'table' }: WinsTrackerProps) {
   const { toast } = useToast();
-  const [apiKey] = useLocalStorage('google-sheets-api-key', '');
-  const [sheetId] = useLocalStorage('google-sheets-id', '1zx957CNpMus2IOY17j0TIt5yopSWs1v3AkAf7TSnExw');
-  const [range] = useLocalStorage('google-sheets-range', 'Master!A2:G');
   
   const [wins, setWins] = useState<Win[]>([]);
   const [loading, setLoading] = useState(false);
@@ -88,18 +89,9 @@ export function WinsTracker({ view = 'table' }: WinsTrackerProps) {
   const [selectedSummary, setSelectedSummary] = useState<string | null>(null);
   
   const fetchData = async () => {
-    if (!apiKey) {
-      toast({
-        title: "API Key Not Set",
-        description: "Please go to Settings and enter your Google Sheets API key.",
-        variant: "destructive"
-      });
-      return;
-    }
-    
     setLoading(true);
     try {
-      const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
+      const url = `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEETS_ID}/values/${GOOGLE_SHEETS_RANGE}?key=${GOOGLE_SHEETS_API_KEY}`;
       const response = await fetch(url);
       
       if (!response.ok) {
@@ -152,7 +144,7 @@ export function WinsTracker({ view = 'table' }: WinsTrackerProps) {
   useEffect(() => {
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [apiKey, sheetId, range]);
+  }, []);
   
   // Get unique categories for filtering
   const categories = useMemo(() => {
