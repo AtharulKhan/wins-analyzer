@@ -1,6 +1,8 @@
+
 import React from 'react';
 import { 
-  ChevronRight, ChevronLeft
+  ChevronRight, ChevronLeft, 
+  LayoutList, LayoutKanban, Calendar, BarChart, Settings
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -16,8 +18,34 @@ interface SidebarProps {
 export function Sidebar({ isCollapsed, onToggle, className }: SidebarProps) {
   const location = useLocation();
   
-  // Empty nav items array
-  const navItems = [];
+  // Navigation items for the wins tracker app
+  const navItems = [
+    {
+      title: 'Table View',
+      icon: LayoutList,
+      href: '/',
+    },
+    {
+      title: 'Kanban View',
+      icon: LayoutKanban,
+      href: '/kanban',
+    },
+    {
+      title: 'Calendar View',
+      icon: Calendar,
+      href: '/calendar',
+    },
+    {
+      title: 'Dashboard',
+      icon: BarChart,
+      href: '/dashboard',
+    },
+    {
+      title: 'Settings',
+      icon: Settings,
+      href: '/settings',
+    }
+  ];
 
   return (
     <aside className={cn(
@@ -30,7 +58,7 @@ export function Sidebar({ isCollapsed, onToggle, className }: SidebarProps) {
           "font-semibold tracking-tight transition-opacity duration-200",
           isCollapsed ? "opacity-0" : "opacity-100"
         )}>
-          MarketPulse
+          Wins Tracker
         </h2>
         
         <Button
@@ -48,7 +76,28 @@ export function Sidebar({ isCollapsed, onToggle, className }: SidebarProps) {
       
       <ScrollArea className="flex-1 py-4">
         <nav className="grid gap-1 px-2">
-          {/* Nav items removed */}
+          {navItems.map((item, index) => {
+            const isActive = location.pathname === item.href;
+            return (
+              <Link
+                key={index}
+                to={item.href}
+                className={cn(
+                  "flex items-center gap-3 rounded-md px-3 py-2 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                  isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground",
+                  isCollapsed && "justify-center px-0"
+                )}
+              >
+                <item.icon className={cn("h-5 w-5 shrink-0")} />
+                <span className={cn(
+                  "text-sm font-medium transition-opacity duration-200",
+                  isCollapsed ? "opacity-0 w-0" : "opacity-100"
+                )}>
+                  {item.title}
+                </span>
+              </Link>
+            );
+          })}
         </nav>
       </ScrollArea>
       
@@ -57,9 +106,9 @@ export function Sidebar({ isCollapsed, onToggle, className }: SidebarProps) {
           "transition-opacity duration-200 rounded-md bg-sidebar-accent/50 p-2 text-xs text-sidebar-accent-foreground",
           isCollapsed ? "opacity-0" : "opacity-100"
         )}>
-          <p className="font-medium">Market Status</p>
-          <p>Markets are open</p>
-          <p className="text-[10px]">Closes in 3h 45m</p>
+          <p className="font-medium">App Status</p>
+          <p>Data last updated: Now</p>
+          <p className="text-[10px]">Wins: 4</p>
         </div>
       </div>
     </aside>

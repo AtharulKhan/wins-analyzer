@@ -1,122 +1,148 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { PageLayout } from '@/components/layout/PageLayout';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Bell, Globe, Lock, User, Settings as SettingsIcon } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { useToast } from '@/hooks/use-toast';
+import { useLocalStorage } from '@/hooks/use-local-storage';
 
 const Settings = () => {
+  const { toast } = useToast();
+  const [apiKey, setApiKey] = useLocalStorage('google-sheets-api-key', '');
+  const [sheetId, setSheetId] = useLocalStorage('google-sheets-id', '1zx957CNpMus2IOY17j0TIt5yopSWs1v3AkAf7TSnExw');
+  const [range, setRange] = useLocalStorage('google-sheets-range', 'Master!A2:E');
+  const [autoRefresh, setAutoRefresh] = useLocalStorage('auto-refresh', false);
+  
+  const handleSave = () => {
+    toast({
+      title: "Settings saved",
+      description: "Your Google Sheets API settings have been saved.",
+    });
+  };
+
+  const handleTestConnection = async () => {
+    if (!apiKey) {
+      toast({
+        title: "API Key Required",
+        description: "Please enter your Google Sheets API key.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    toast({
+      title: "Testing connection...",
+      description: "Attempting to connect to Google Sheets."
+    });
+
+    try {
+      const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (data.values && data.values.length) {
+        toast({
+          title: "Connection successful!",
+          description: `Retrieved ${data.values.length} rows from your sheet.`,
+          variant: "success"
+        });
+      } else {
+        toast({
+          title: "Connected, but no data found",
+          description: "Your API key works, but the sheet or range might be empty.",
+          variant: "warning"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Connection failed",
+        description: error instanceof Error ? error.message : "Could not connect to Google Sheets API.",
+        variant: "destructive"
+      });
+    }
+  };
+
   return (
     <PageLayout title="Settings">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-1">
-          <div className="bg-card rounded-lg p-6 shadow">
-            <h2 className="text-xl font-semibold mb-4">Settings</h2>
-            <nav className="space-y-2">
-              <Button variant="ghost" className="w-full justify-start" size="lg">
-                <User className="mr-2 h-5 w-5" />
-                Account
-              </Button>
-              <Button variant="ghost" className="w-full justify-start" size="lg">
-                <Bell className="mr-2 h-5 w-5" />
-                Notifications
-              </Button>
-              <Button variant="ghost" className="w-full justify-start" size="lg">
-                <Lock className="mr-2 h-5 w-5" />
-                Security
-              </Button>
-              <Button variant="ghost" className="w-full justify-start" size="lg">
-                <Globe className="mr-2 h-5 w-5" />
-                Regional Settings
-              </Button>
-              <Button variant="ghost" className="w-full justify-start" size="lg">
-                <SettingsIcon className="mr-2 h-5 w-5" />
-                Preferences
-              </Button>
-            </nav>
-          </div>
-        </div>
-        
-        <div className="lg:col-span-2">
-          <div className="bg-card rounded-lg p-6 shadow">
-            <h2 className="text-xl font-semibold mb-6">Account Settings</h2>
-            
-            <div className="space-y-6">
-              <div>
-                <h3 className="text-lg font-medium mb-4">Personal Information</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-1">First Name</label>
-                    <input 
-                      type="text" 
-                      defaultValue="John"
-                      className="w-full px-3 py-2 border rounded-md" 
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Last Name</label>
-                    <input 
-                      type="text" 
-                      defaultValue="Smith"
-                      className="w-full px-3 py-2 border rounded-md" 
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Email</label>
-                    <input 
-                      type="email" 
-                      defaultValue="john.smith@example.com"
-                      className="w-full px-3 py-2 border rounded-md" 
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Phone</label>
-                    <input 
-                      type="text" 
-                      defaultValue="+1 (555) 123-4567"
-                      className="w-full px-3 py-2 border rounded-md" 
-                    />
-                  </div>
-                </div>
-              </div>
-              
-              <div>
-                <h3 className="text-lg font-medium mb-4">Display Settings</h3>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium">Dark Mode</p>
-                      <p className="text-sm text-muted-foreground">Switch between light and dark theme</p>
-                    </div>
-                    <div>
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" className="sr-only peer" />
-                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                      </label>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium">Compact View</p>
-                      <p className="text-sm text-muted-foreground">Show more data with less spacing</p>
-                    </div>
-                    <div>
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" className="sr-only peer" defaultChecked />
-                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="pt-4 border-t">
-                <Button>Save Changes</Button>
-                <Button variant="outline" className="ml-2">Cancel</Button>
-              </div>
+      <div className="max-w-2xl mx-auto">
+        <Card>
+          <CardHeader>
+            <CardTitle>Google Sheets Integration</CardTitle>
+            <CardDescription>
+              Configure your Google Sheets API connection to fetch your wins data.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="api-key">Google Sheets API Key</Label>
+              <Input 
+                id="api-key" 
+                type="password" 
+                value={apiKey} 
+                onChange={(e) => setApiKey(e.target.value)} 
+                placeholder="Enter your Google Sheets API key" 
+              />
+              <p className="text-sm text-muted-foreground">
+                You can obtain an API key from the <a href="https://console.cloud.google.com/" target="_blank" rel="noreferrer" className="text-primary underline">Google Cloud Console</a>. 
+                Enable the Google Sheets API for your project.
+              </p>
             </div>
-          </div>
-        </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="sheet-id">Spreadsheet ID</Label>
+              <Input 
+                id="sheet-id" 
+                value={sheetId} 
+                onChange={(e) => setSheetId(e.target.value)} 
+                placeholder="Spreadsheet ID from the URL" 
+              />
+              <p className="text-sm text-muted-foreground">
+                This is the long string of characters in your Google Sheets URL.
+              </p>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="range">Sheet Range</Label>
+              <Input 
+                id="range" 
+                value={range} 
+                onChange={(e) => setRange(e.target.value)} 
+                placeholder="e.g., Sheet1!A2:E" 
+              />
+              <p className="text-sm text-muted-foreground">
+                Specify the tab name and cell range containing your data.
+              </p>
+            </div>
+            
+            <div className="flex items-center justify-between pt-2">
+              <div className="space-y-0.5">
+                <Label htmlFor="auto-refresh">Auto Refresh</Label>
+                <p className="text-sm text-muted-foreground">
+                  Automatically refresh data every 5 minutes
+                </p>
+              </div>
+              <Switch 
+                id="auto-refresh" 
+                checked={autoRefresh} 
+                onCheckedChange={setAutoRefresh} 
+              />
+            </div>
+          </CardContent>
+          <CardFooter className="flex justify-between">
+            <Button variant="outline" onClick={handleTestConnection}>
+              Test Connection
+            </Button>
+            <Button onClick={handleSave}>Save Settings</Button>
+          </CardFooter>
+        </Card>
       </div>
     </PageLayout>
   );
