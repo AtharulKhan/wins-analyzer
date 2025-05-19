@@ -55,7 +55,7 @@ export function WinsList({
                 </TableRow>
               ) : (
                 isMobile ? (
-                  <div className="px-1 py-4 w-full">
+                  <div className="px-1 py-4 w-full flex flex-col overflow-x-hidden">
                     {groupedWins.ungrouped.map((win) => (
                       <WinItem 
                         key={win.id}
@@ -90,7 +90,7 @@ export function WinsList({
                   {group}
                 </div>
                 {isMobile ? (
-                  <div className="px-1 py-4 w-full">
+                  <div className="px-1 py-4 w-full flex flex-col overflow-x-hidden">
                     {groupWins.map((win) => (
                       <WinItem
                         key={win.id}
