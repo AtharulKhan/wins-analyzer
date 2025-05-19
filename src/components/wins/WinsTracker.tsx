@@ -1,5 +1,6 @@
+
 import React, { useEffect, useState, useMemo } from 'react';
-import { Search, Filter, Star, Archive, ExternalLink, BarChart, ArrowUp, ArrowDown } from 'lucide-react';
+import { Search, Filter, Star, Archive, ExternalLink, BarChart, ArrowUp, ArrowDown, FileText } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
