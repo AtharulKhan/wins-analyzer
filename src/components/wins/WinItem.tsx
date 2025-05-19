@@ -34,7 +34,7 @@ export function WinItem({ win, toggleFavorite, toggleArchive, viewSummary, isMob
   
   if (isMobile) {
     return (
-      <Card className="mb-4 mx-2">
+      <Card className="mb-4 mx-1 overflow-hidden w-[calc(100%-8px)]">
         <CardHeader className="pb-2">
           <CardTitle className="text-md font-medium">
             <span className="block truncate max-w-full">{win.title}</span>
@@ -93,7 +93,7 @@ export function WinItem({ win, toggleFavorite, toggleArchive, viewSummary, isMob
             variant="ghost" 
             size="sm" 
             onClick={() => toggleFavorite(win.id)}
-            className={`${win.isFavorite ? "text-red-500" : ""} text-xs px-2`}
+            className={`${win.isFavorite ? "text-red-500" : ""} text-xs px-1`}
           >
             <Heart className="h-3 w-3 mr-1" />
             {win.isFavorite ? "Favorited" : "Favorite"}
@@ -103,7 +103,7 @@ export function WinItem({ win, toggleFavorite, toggleArchive, viewSummary, isMob
             variant="ghost" 
             size="sm" 
             onClick={() => toggleArchive(win.id)}
-            className="text-xs px-2"
+            className="text-xs px-1"
           >
             <Archive className="h-3 w-3 mr-1" />
             {win.isArchived ? "Archived" : "Archive"}
@@ -113,7 +113,7 @@ export function WinItem({ win, toggleFavorite, toggleArchive, viewSummary, isMob
             variant="ghost" 
             size="sm" 
             onClick={() => viewSummary(win.summary)}
-            className="text-xs px-2"
+            className="text-xs px-1"
           >
             <Eye className="h-3 w-3 mr-1" />
             View

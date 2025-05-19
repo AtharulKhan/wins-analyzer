@@ -30,7 +30,7 @@ export function WinsList({
   isMobile = false
 }: WinsListProps) {
   return (
-    <Card className={isMobile ? "mx-4" : ""}>
+    <Card className={isMobile ? "mx-2 max-w-[100vw] overflow-hidden" : ""}>
       <CardContent className="p-0">
         {groupBy === 'none' ? (
           <Table>
@@ -55,7 +55,7 @@ export function WinsList({
                 </TableRow>
               ) : (
                 isMobile ? (
-                  <div className="px-2 py-4">
+                  <div className="px-1 py-4 w-full">
                     {groupedWins.ungrouped.map((win) => (
                       <WinItem 
                         key={win.id}
@@ -90,7 +90,7 @@ export function WinsList({
                   {group}
                 </div>
                 {isMobile ? (
-                  <div className="px-2 py-4">
+                  <div className="px-1 py-4 w-full">
                     {groupWins.map((win) => (
                       <WinItem
                         key={win.id}
