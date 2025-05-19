@@ -31,8 +31,8 @@ export function WinItem({ win, toggleFavorite, toggleArchive, viewSummary, isMob
       <Card className="mb-4">
         <CardHeader className="pb-2">
           <CardTitle className="text-md font-medium flex items-center justify-between">
-            <span className="truncate">{win.title}</span>
-            <Badge variant={win.isFavorite ? "default" : "outline"}>
+            <span className="truncate max-w-[200px]">{win.title}</span>
+            <Badge variant={win.isFavorite ? "default" : "outline"} className="ml-2 shrink-0">
               {win.category}
             </Badge>
           </CardTitle>
@@ -51,14 +51,14 @@ export function WinItem({ win, toggleFavorite, toggleArchive, viewSummary, isMob
             </div>
           )}
         </CardContent>
-        <CardFooter className="flex justify-between pt-0">
+        <CardFooter className="flex flex-wrap pt-0 gap-2">
           <Button 
             variant="ghost" 
             size="sm" 
             onClick={() => toggleFavorite(win.id)}
-            className={win.isFavorite ? "text-red-500" : ""}
+            className={`${win.isFavorite ? "text-red-500" : ""} text-xs px-2`}
           >
-            <Heart className="h-4 w-4 mr-1" />
+            <Heart className="h-3 w-3 mr-1" />
             {win.isFavorite ? "Favorited" : "Favorite"}
           </Button>
           
@@ -66,8 +66,9 @@ export function WinItem({ win, toggleFavorite, toggleArchive, viewSummary, isMob
             variant="ghost" 
             size="sm" 
             onClick={() => toggleArchive(win.id)}
+            className="text-xs px-2"
           >
-            <Archive className="h-4 w-4 mr-1" />
+            <Archive className="h-3 w-3 mr-1" />
             {win.isArchived ? "Archived" : "Archive"}
           </Button>
           
@@ -75,8 +76,9 @@ export function WinItem({ win, toggleFavorite, toggleArchive, viewSummary, isMob
             variant="ghost" 
             size="sm" 
             onClick={() => viewSummary(win.summary)}
+            className="text-xs px-2"
           >
-            <Eye className="h-4 w-4 mr-1" />
+            <Eye className="h-3 w-3 mr-1" />
             View
           </Button>
         </CardFooter>
