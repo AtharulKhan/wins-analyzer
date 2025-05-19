@@ -1,124 +1,123 @@
 
 import React from 'react';
-import { Star, Archive, ExternalLink, FileText } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
+import { Heart, Archive, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { TableRow, TableCell } from "@/components/ui/table";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Badge } from '@/components/ui/badge';
+import { TableRow, TableCell } from '@/components/ui/table';
 import { Win } from './types';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 
 interface WinItemProps {
   win: Win;
   toggleFavorite: (id: string) => void;
   toggleArchive: (id: string) => void;
   viewSummary: (summary: string) => void;
+  isMobile?: boolean;
 }
 
-export function WinItem({ win, toggleFavorite, toggleArchive, viewSummary }: WinItemProps) {
+export function WinItem({ win, toggleFavorite, toggleArchive, viewSummary, isMobile = false }: WinItemProps) {
+  const timeAgo = formatDistanceToNow(new Date(win.date), { addSuffix: true });
+  
+  if (isMobile) {
+    return (
+      <Card className="mb-4">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-md font-medium flex items-center justify-between">
+            <span className="truncate">{win.title}</span>
+            <Badge variant={win.favorite ? "default" : "outline"}>
+              {win.category}
+            </Badge>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pb-2">
+          <div className="text-sm text-muted-foreground mb-1">
+            <span>{win.platform} • {timeAgo}</span>
+          </div>
+          {win.subCategories.length > 0 && (
+            <div className="flex flex-wrap gap-1 mt-2">
+              {win.subCategories.map(subCategory => (
+                <Badge key={subCategory} variant="secondary" className="text-xs">
+                  {subCategory}
+                </Badge>
+              ))}
+            </div>
+          )}
+        </CardContent>
+        <CardFooter className="flex justify-between pt-0">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => toggleFavorite(win.id)}
+            className={win.favorite ? "text-red-500" : ""}
+          >
+            <Heart className="h-4 w-4 mr-1" />
+            {win.favorite ? "Favorited" : "Favorite"}
+          </Button>
+          
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => toggleArchive(win.id)}
+          >
+            <Archive className="h-4 w-4 mr-1" />
+            {win.archived ? "Archived" : "Archive"}
+          </Button>
+          
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => viewSummary(win.summary)}
+          >
+            <Eye className="h-4 w-4 mr-1" />
+            View
+          </Button>
+        </CardFooter>
+      </Card>
+    );
+  }
+  
   return (
-    <TableRow key={win.id}>
+    <TableRow>
+      <TableCell className="font-medium">{win.title}</TableCell>
+      <TableCell>{win.category}</TableCell>
+      <TableCell>
+        <div className="flex flex-wrap gap-1">
+          {win.subCategories.map(subCategory => (
+            <Badge key={subCategory} variant="secondary" className="text-xs">
+              {subCategory}
+            </Badge>
+          ))}
+        </div>
+      </TableCell>
+      <TableCell>{win.platform}</TableCell>
+      <TableCell>{timeAgo}</TableCell>
       <TableCell>
         <div className="flex items-center gap-1">
-          <a 
-            href={win.link} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="font-medium hover:underline flex items-center gap-1"
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => toggleFavorite(win.id)}
+            className={win.favorite ? "text-red-500" : ""}
           >
-            {win.title}
-            {win.link && <ExternalLink className="h-3 w-3" />}
-          </a>
-          {win.isFavorite && <Star className="h-3 w-3 text-yellow-500" />}
-        </div>
-      </TableCell>
-      <TableCell>
-        <div className="flex flex-wrap gap-1">
-          {win.category.split(',').map((cat, idx) => (
-            <span 
-              key={idx} 
-              className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-muted"
-            >
-              {cat.trim()}
-            </span>
-          ))}
-        </div>
-      </TableCell>
-      <TableCell>
-        <div className="flex flex-wrap gap-1">
-          {win.subCategories.split(',').map((subCat, idx) => (
-            <span 
-              key={idx} 
-              className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-muted/60"
-            >
-              {subCat.trim()}
-            </span>
-          ))}
-        </div>
-      </TableCell>
-      <TableCell>
-        <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-muted/30">
-          {win.platform}
-        </span>
-      </TableCell>
-      <TableCell>
-        {win.date.toLocaleDateString()}
-      </TableCell>
-      <TableCell>
-        <div className="flex space-x-1">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => viewSummary(win.summary)}
-                >
-                  <FileText className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>View Summary</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+            <Heart className="h-4 w-4" />
+          </Button>
           
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => toggleFavorite(win.id)}
-                >
-                  <Star className={`h-4 w-4 ${win.isFavorite ? "text-yellow-500 fill-yellow-500" : ""}`} />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{win.isFavorite ? "Remove from favorites" : "Add to favorites"}</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => toggleArchive(win.id)}
+          >
+            <Archive className="h-4 w-4" />
+          </Button>
           
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => toggleArchive(win.id)}
-                >
-                  <Archive className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Archive win</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => viewSummary(win.summary)}
+          >
+            <Eye className="h-4 w-4" />
+          </Button>
         </div>
       </TableCell>
     </TableRow>

@@ -18,24 +18,34 @@ interface WinsListProps {
   toggleFavorite: (id: string) => void;
   toggleArchive: (id: string) => void;
   setSelectedSummary: (summary: string) => void;
+  isMobile?: boolean;
 }
 
-export function WinsList({ groupedWins, groupBy, toggleFavorite, toggleArchive, setSelectedSummary }: WinsListProps) {
+export function WinsList({ 
+  groupedWins, 
+  groupBy, 
+  toggleFavorite, 
+  toggleArchive, 
+  setSelectedSummary,
+  isMobile = false
+}: WinsListProps) {
   return (
     <Card>
       <CardContent className="p-0">
         {groupBy === 'none' ? (
           <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Title</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Sub-Categories</TableHead>
-                <TableHead>Platform</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead className="w-[150px]">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
+            {!isMobile && (
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Title</TableHead>
+                  <TableHead>Category</TableHead>
+                  <TableHead>Sub-Categories</TableHead>
+                  <TableHead>Platform</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead className="w-[150px]">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+            )}
             <TableBody>
               {groupedWins.ungrouped.length === 0 ? (
                 <TableRow>
@@ -51,6 +61,7 @@ export function WinsList({ groupedWins, groupBy, toggleFavorite, toggleArchive, 
                     toggleFavorite={toggleFavorite}
                     toggleArchive={toggleArchive}
                     viewSummary={setSelectedSummary}
+                    isMobile={isMobile}
                   />
                 ))
               )}
@@ -64,6 +75,18 @@ export function WinsList({ groupedWins, groupBy, toggleFavorite, toggleArchive, 
                   {group}
                 </div>
                 <Table>
+                  {!isMobile && (
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Title</TableHead>
+                        <TableHead>Category</TableHead>
+                        <TableHead>Sub-Categories</TableHead>
+                        <TableHead>Platform</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead className="w-[150px]">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                  )}
                   <TableBody>
                     {groupWins.map((win) => (
                       <WinItem
@@ -72,6 +95,7 @@ export function WinsList({ groupedWins, groupBy, toggleFavorite, toggleArchive, 
                         toggleFavorite={toggleFavorite}
                         toggleArchive={toggleArchive}
                         viewSummary={setSelectedSummary}
+                        isMobile={isMobile}
                       />
                     ))}
                   </TableBody>
