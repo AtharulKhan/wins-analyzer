@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { Heart, Archive, Eye, ChevronDown, ChevronUp } from 'lucide-react';
@@ -49,10 +50,10 @@ export function WinItem({ win, toggleFavorite, toggleArchive, viewSummary, isMob
             {win.platform} • {timeAgo}
           </div>
           {subCategoriesArray.length > 0 && (
-            <div className="mt-2 w-full">
-              <div className="flex flex-wrap gap-1 w-full">
+            <div className="mt-2 w-full overflow-visible">
+              <div className="flex flex-wrap gap-1.5 w-full">
                 {visibleSubCategories.map(subCategory => (
-                  <Badge key={subCategory} variant="secondary" className="text-xs mb-1">
+                  <Badge key={subCategory} variant="secondary" className="text-xs mb-1.5 whitespace-normal">
                     {subCategory}
                   </Badge>
                 ))}
@@ -60,10 +61,10 @@ export function WinItem({ win, toggleFavorite, toggleArchive, viewSummary, isMob
               
               {hasMultipleSubCategories && (
                 <Button 
-                  variant="ghost" 
+                  variant="outline" 
                   size="sm" 
                   onClick={() => setShowAllSubCategories(!showAllSubCategories)}
-                  className="text-xs px-2 py-0 h-6 mt-1"
+                  className="text-xs mt-1.5 h-7 w-auto"
                 >
                   {showAllSubCategories ? (
                     <>
@@ -73,7 +74,7 @@ export function WinItem({ win, toggleFavorite, toggleArchive, viewSummary, isMob
                   ) : (
                     <>
                       <ChevronDown className="h-3 w-3 mr-1" />
-                      Show {subCategoriesArray.length - 2} more
+                      +{subCategoriesArray.length - 2} more
                     </>
                   )}
                 </Button>
