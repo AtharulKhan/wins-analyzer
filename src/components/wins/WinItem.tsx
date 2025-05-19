@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { Heart, Archive, Eye, ChevronDown, ChevronUp } from 'lucide-react';
@@ -96,21 +95,11 @@ export function WinItem({ win, toggleFavorite, toggleArchive, viewSummary, isMob
           <Button 
             variant="ghost" 
             size="sm" 
-            onClick={() => toggleArchive(win.id)}
-            className="text-xs px-1"
-          >
-            <Archive className="h-3 w-3 mr-1" />
-            {win.isArchived ? "Archived" : "Archive"}
-          </Button>
-          
-          <Button 
-            variant="ghost" 
-            size="sm" 
             onClick={() => viewSummary(win.summary)}
             className="text-xs px-1"
           >
             <Eye className="h-3 w-3 mr-1" />
-            View
+            View Summary
           </Button>
         </CardFooter>
       </Card>
