@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { Heart, Archive, Eye, ChevronDown, ChevronUp } from 'lucide-react';
@@ -51,18 +50,12 @@ export function WinItem({ win, toggleFavorite, toggleArchive, viewSummary, isMob
           </div>
           {subCategoriesArray.length > 0 && (
             <div className="mt-2 w-full">
-              <div className={cn(
-                "flex flex-wrap gap-1 w-full", 
-                !showAllSubCategories && hasMultipleSubCategories && "relative max-h-8 overflow-hidden"
-              )}>
+              <div className="flex flex-wrap gap-1 w-full">
                 {visibleSubCategories.map(subCategory => (
-                  <Badge key={subCategory} variant="secondary" className="text-xs">
+                  <Badge key={subCategory} variant="secondary" className="text-xs mb-1">
                     {subCategory}
                   </Badge>
                 ))}
-                {!showAllSubCategories && hasMultipleSubCategories && (
-                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-card" />
-                )}
               </div>
               
               {hasMultipleSubCategories && (
@@ -70,7 +63,7 @@ export function WinItem({ win, toggleFavorite, toggleArchive, viewSummary, isMob
                   variant="ghost" 
                   size="sm" 
                   onClick={() => setShowAllSubCategories(!showAllSubCategories)}
-                  className="text-xs p-0 h-6 mt-1 w-full flex justify-center items-center"
+                  className="text-xs px-2 py-0 h-6 mt-1"
                 >
                   {showAllSubCategories ? (
                     <>
@@ -80,7 +73,7 @@ export function WinItem({ win, toggleFavorite, toggleArchive, viewSummary, isMob
                   ) : (
                     <>
                       <ChevronDown className="h-3 w-3 mr-1" />
-                      Show More ({subCategoriesArray.length - 2})
+                      Show {subCategoriesArray.length - 2} more
                     </>
                   )}
                 </Button>
