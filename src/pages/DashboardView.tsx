@@ -8,7 +8,7 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   Cell
 } from 'recharts';
-import { Calendar, Star, TrendingUp } from 'lucide-react';
+import { BarChart as BarChartIcon, Calendar, Star, TrendingUp } from 'lucide-react';
 import { StatsCard } from '@/components/ui/StatsCard';
 import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
 import { WinsTracker } from '@/components/wins/WinsTracker';
@@ -33,6 +33,12 @@ const DashboardView = () => {
     'model', 'accuracy', 'client', 'used', 'article', 'content', 'personal'
   ];
 
+  const chartConfig = {
+    categoryBar: {
+      color: '#8B5CF6',
+    },
+  };
+
   return (
     <PageLayout title="Dashboard">
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -48,7 +54,7 @@ const DashboardView = () => {
           title="Top Categories"
           value="Web Development"
           description="4 wins in this category"
-          icon={<BarChart className="h-4 w-4" />}
+          icon={<BarChartIcon className="h-4 w-4" />}
           className="bg-primary/5"
         />
         
@@ -75,18 +81,20 @@ const DashboardView = () => {
           </CardHeader>
           <CardContent>
             <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={mockCategoryData} layout="vertical" margin={{ left: 80 }}>
-                  <XAxis type="number" />
-                  <YAxis type="category" dataKey="name" tick={{ fontSize: 12 }} width={80} />
-                  <Tooltip content={<ChartTooltipContent />} />
-                  <Bar dataKey="value" radius={[0, 4, 4, 0]}>
-                    {mockCategoryData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.fill} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
+              <ChartContainer config={chartConfig}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={mockCategoryData} layout="vertical" margin={{ left: 80 }}>
+                    <XAxis type="number" />
+                    <YAxis type="category" dataKey="name" tick={{ fontSize: 12 }} width={80} />
+                    <Tooltip content={<ChartTooltipContent />} />
+                    <Bar dataKey="value" radius={[0, 4, 4, 0]}>
+                      {mockCategoryData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.fill} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </ChartContainer>
             </div>
           </CardContent>
         </Card>
