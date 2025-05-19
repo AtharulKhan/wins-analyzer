@@ -218,19 +218,29 @@ const DashboardView = () => {
     return { current: currentStreak, longest: longestStreak };
   }, [activeWins]);
 
-  // Extract common themes/keywords from all fields
+  // Extract common themes/keywords ONLY from title and description fields
   const commonKeywords = useMemo(() => {
     if (!activeWins.length) return [];
     
-    // Combine all text from wins
+    // Combine text ONLY from title and description fields
     let allText = activeWins.map(win => 
-      `${win.title || ''} ${win.category || ''} ${win.desc || ''}`
+      `${win.title || ''} ${win.desc || ''}`
     ).join(' ').toLowerCase();
     
     // Remove common stop words and short words
-    const stopWords = ['the', 'and', 'a', 'to', 'in', 'with', 'of', 'for', 'on', 'at', 'from', 'by'];
+    const stopWords = [
+      'the', 'and', 'a', 'to', 'in', 'with', 'of', 'for', 'on', 'at', 'from', 'by', 
+      'is', 'are', 'was', 'were', 'will', 'would', 'should', 'can', 'could',
+      'has', 'have', 'had', 'not', 'be', 'been', 'being', 'as', 'if', 'or',
+      'this', 'that', 'these', 'those', 'it', 'its', 'they', 'them', 'their',
+      'who', 'whom', 'whose', 'what', 'which', 'when', 'where', 'why', 'how',
+      'all', 'any', 'both', 'each', 'few', 'more', 'most', 'some', 'such',
+      'no', 'nor', 'too', 'very', 'just', 'but'
+    ];
+    
+    // Split by non-word characters and filter
     const words = allText.split(/\W+/).filter(word => 
-      word.length > 2 && !stopWords.includes(word)
+      word.length > 2 && !stopWords.includes(word) && isNaN(Number(word))
     );
     
     // Count word frequencies
@@ -366,7 +376,7 @@ const DashboardView = () => {
         <Card className="lg:col-span-4">
           <CardHeader>
             <CardTitle>Common Themes</CardTitle>
-            <p className="text-sm text-muted-foreground">Frequently mentioned keywords</p>
+            <p className="text-sm text-muted-foreground">Frequently mentioned keywords in titles and descriptions</p>
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2 justify-center">
@@ -382,6 +392,9 @@ const DashboardView = () => {
                   {keyword}
                 </div>
               ))}
+              {commonKeywords.length === 0 && (
+                <div className="text-muted-foreground text-sm">No common keywords found</div>
+              )}
             </div>
           </CardContent>
         </Card>
