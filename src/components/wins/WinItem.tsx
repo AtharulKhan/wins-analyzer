@@ -37,7 +37,7 @@ export function WinItem({ win, toggleFavorite, toggleArchive, viewSummary, isMob
       <Card className="mb-4 mx-1 w-full">
         <CardHeader className="pb-2">
           <CardTitle className="text-md font-medium">
-            <span className="block truncate max-w-full">{win.title}</span>
+            <span className="block break-words w-full overflow-hidden text-ellipsis">{win.title}</span>
           </CardTitle>
           <div className="mt-1">
             <Badge variant={win.isFavorite ? "default" : "outline"} className="shrink-0">
