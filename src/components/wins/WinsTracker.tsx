@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
-import { Search, Filter, Star, Archive, ExternalLink, BarChart, ArrowUp, ArrowDown, List, ListOrdered } from 'lucide-react';
+import { Search, Filter, Star, Archive, ExternalLink, BarChart, ArrowUp, ArrowDown, List, ListOrdered, FileText } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -34,14 +34,32 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface Win {
   id: string;
   title: string;
   category: string;
+  subCategories: string;
+  summary: string;
+  platform: string;
   date: Date;
   link: string;
-  desc: string;
   isFavorite?: boolean;
   isArchived?: boolean;
 }
@@ -54,17 +72,20 @@ export function WinsTracker({ view = 'table' }: WinsTrackerProps) {
   const { toast } = useToast();
   const [apiKey] = useLocalStorage('google-sheets-api-key', '');
   const [sheetId] = useLocalStorage('google-sheets-id', '1zx957CNpMus2IOY17j0TIt5yopSWs1v3AkAf7TSnExw');
-  const [range] = useLocalStorage('google-sheets-range', 'Master!A2:E');
+  const [range] = useLocalStorage('google-sheets-range', 'Master!A2:G');
   
   const [wins, setWins] = useState<Win[]>([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string[]>([]);
+  const [subCategoryFilter, setSubCategoryFilter] = useState<string[]>([]);
+  const [platformFilter, setPlatformFilter] = useState<string[]>([]);
   const [dateRange, setDateRange] = useState({ preset: 'all', from: null, to: null });
   const [favorites, setFavorites] = useLocalStorage('win-favorites', [] as string[]);
   const [archived, setArchived] = useLocalStorage('win-archived', [] as string[]);
   const [sortBy, setSortBy] = useState({ key: 'date', order: 'desc' });
   const [groupBy, setGroupBy] = useState('none');
+  const [selectedSummary, setSelectedSummary] = useState<string | null>(null);
   
   const fetchData = async () => {
     if (!apiKey) {
@@ -89,15 +110,17 @@ export function WinsTracker({ view = 'table' }: WinsTrackerProps) {
       
       if (data.values && data.values.length) {
         const parsedWins: Win[] = data.values.map((row: string[], index: number) => {
-          const [title, category, dateStr, link, desc] = row;
+          const [title, category, subCategories, summary, platform, dateStr, link] = row;
           const id = `win-${index}-${dateStr}`;
           return {
             id,
             title: title || 'Untitled',
             category: category || 'Uncategorized',
+            subCategories: subCategories || '',
+            summary: summary || '',
+            platform: platform || '',
             date: dateStr ? new Date(dateStr) : new Date(),
             link: link || '',
-            desc: desc || '',
             isFavorite: favorites.includes(id),
             isArchived: archived.includes(id)
           };
@@ -139,6 +162,19 @@ export function WinsTracker({ view = 'table' }: WinsTrackerProps) {
     return [...new Set(allCategories)].filter(Boolean).sort();
   }, [wins]);
   
+  // Get unique subcategories for filtering
+  const subCategories = useMemo(() => {
+    const allSubCategories = wins.flatMap(win => 
+      win.subCategories.split(',').map(subCat => subCat.trim())
+    );
+    return [...new Set(allSubCategories)].filter(Boolean).sort();
+  }, [wins]);
+  
+  // Get unique platforms for filtering
+  const platforms = useMemo(() => {
+    return [...new Set(wins.map(win => win.platform))].filter(Boolean).sort();
+  }, [wins]);
+  
   // Filter wins based on search and filters
   const filteredWins = useMemo(() => {
     return wins.filter(win => {
@@ -147,7 +183,7 @@ export function WinsTracker({ view = 'table' }: WinsTrackerProps) {
       
       // Text search (case insensitive)
       const searchMatch = !search || 
-        `${win.title} ${win.category} ${win.desc}`.toLowerCase().includes(search.toLowerCase());
+        `${win.title} ${win.category} ${win.subCategories} ${win.summary} ${win.platform}`.toLowerCase().includes(search.toLowerCase());
       if (!searchMatch) return false;
       
       // Category filter
@@ -156,6 +192,17 @@ export function WinsTracker({ view = 'table' }: WinsTrackerProps) {
           categoryFilter.includes(cat.trim())
         );
       if (!categoryMatch) return false;
+      
+      // Sub-category filter
+      const subCategoryMatch = subCategoryFilter.length === 0 ||
+        win.subCategories.split(',').some(subCat => 
+          subCategoryFilter.includes(subCat.trim())
+        );
+      if (!subCategoryMatch) return false;
+      
+      // Platform filter
+      const platformMatch = platformFilter.length === 0 || platformFilter.includes(win.platform);
+      if (!platformMatch) return false;
       
       // Date range filter
       if (dateRange.preset !== 'all') {
@@ -180,7 +227,7 @@ export function WinsTracker({ view = 'table' }: WinsTrackerProps) {
       
       return true;
     });
-  }, [wins, search, categoryFilter, dateRange, archived]);
+  }, [wins, search, categoryFilter, subCategoryFilter, platformFilter, dateRange, archived]);
   
   // Sort wins based on sort criteria
   const sortedWins = useMemo(() => {
@@ -197,6 +244,10 @@ export function WinsTracker({ view = 'table' }: WinsTrackerProps) {
         return sortBy.order === 'asc'
           ? a.category.localeCompare(b.category)
           : b.category.localeCompare(a.category);
+      } else if (sortBy.key === 'platform') {
+        return sortBy.order === 'asc'
+          ? a.platform.localeCompare(b.platform)
+          : b.platform.localeCompare(a.platform);
       }
       return 0;
     });
@@ -219,6 +270,32 @@ export function WinsTracker({ view = 'table' }: WinsTrackerProps) {
           }
           grouped[category].push(win);
         });
+      });
+    } else if (groupBy === 'subCategory') {
+      sortedWins.forEach(win => {
+        const subCategories = win.subCategories.split(',').map(sc => sc.trim());
+        if (subCategories.length === 0 || (subCategories.length === 1 && !subCategories[0])) {
+          // Handle empty subCategories
+          if (!grouped['Uncategorized']) {
+            grouped['Uncategorized'] = [];
+          }
+          grouped['Uncategorized'].push(win);
+        } else {
+          subCategories.forEach(subCategory => {
+            if (!grouped[subCategory]) {
+              grouped[subCategory] = [];
+            }
+            grouped[subCategory].push(win);
+          });
+        }
+      });
+    } else if (groupBy === 'platform') {
+      sortedWins.forEach(win => {
+        const platform = win.platform || 'Unknown';
+        if (!grouped[platform]) {
+          grouped[platform] = [];
+        }
+        grouped[platform].push(win);
       });
     } else if (groupBy === 'month') {
       sortedWins.forEach(win => {
@@ -299,6 +376,8 @@ export function WinsTracker({ view = 'table' }: WinsTrackerProps) {
   const resetFilters = () => {
     setSearch('');
     setCategoryFilter([]);
+    setSubCategoryFilter([]);
+    setPlatformFilter([]);
     setDateRange({ preset: 'all', from: null, to: null });
   };
   
@@ -322,7 +401,7 @@ export function WinsTracker({ view = 'table' }: WinsTrackerProps) {
               <Button variant="outline" className="flex items-center gap-1">
                 <Filter className="h-4 w-4" />
                 <span>Filter</span>
-                {(categoryFilter.length > 0 || dateRange.preset !== 'all') && (
+                {(categoryFilter.length > 0 || subCategoryFilter.length > 0 || platformFilter.length > 0 || dateRange.preset !== 'all') && (
                   <span className="ml-1 flex h-2 w-2 rounded-full bg-primary"></span>
                 )}
               </Button>
@@ -346,6 +425,52 @@ export function WinsTracker({ view = 'table' }: WinsTrackerProps) {
                       }}
                     >
                       {category}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="mb-4">
+                <h4 className="mb-2 text-sm font-medium">Sub-Categories</h4>
+                <div className="flex flex-wrap gap-1 max-h-36 overflow-y-auto">
+                  {subCategories.map(subCategory => (
+                    <Button
+                      key={subCategory}
+                      variant={subCategoryFilter.includes(subCategory) ? "default" : "outline"}
+                      size="sm"
+                      className="h-7 text-xs"
+                      onClick={() => {
+                        setSubCategoryFilter(prev => 
+                          prev.includes(subCategory) 
+                            ? prev.filter(c => c !== subCategory) 
+                            : [...prev, subCategory]
+                        );
+                      }}
+                    >
+                      {subCategory}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="mb-4">
+                <h4 className="mb-2 text-sm font-medium">Platform</h4>
+                <div className="flex flex-wrap gap-1 max-h-36 overflow-y-auto">
+                  {platforms.map(platform => (
+                    <Button
+                      key={platform}
+                      variant={platformFilter.includes(platform) ? "default" : "outline"}
+                      size="sm"
+                      className="h-7 text-xs"
+                      onClick={() => {
+                        setPlatformFilter(prev => 
+                          prev.includes(platform) 
+                            ? prev.filter(p => p !== platform) 
+                            : [...prev, platform]
+                        );
+                      }}
+                    >
+                      {platform}
                     </Button>
                   ))}
                 </div>
@@ -417,6 +542,18 @@ export function WinsTracker({ view = 'table' }: WinsTrackerProps) {
                 {sortBy.key === 'title' && sortBy.order === 'desc' && <span className="mr-2">✓</span>}
                 Title Z-A
               </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => setSortBy({ key: 'category', order: 'asc' })}
+              >
+                {sortBy.key === 'category' && sortBy.order === 'asc' && <span className="mr-2">✓</span>}
+                Category A-Z
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => setSortBy({ key: 'platform', order: 'asc' })}
+              >
+                {sortBy.key === 'platform' && sortBy.order === 'asc' && <span className="mr-2">✓</span>}
+                Platform A-Z
+              </DropdownMenuItem>
               
               <DropdownMenuSeparator />
               
@@ -432,6 +569,18 @@ export function WinsTracker({ view = 'table' }: WinsTrackerProps) {
               >
                 {groupBy === 'category' && <span className="mr-2">✓</span>}
                 Group by Category
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setGroupBy('subCategory')}
+              >
+                {groupBy === 'subCategory' && <span className="mr-2">✓</span>}
+                Group by Sub-Category
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setGroupBy('platform')}
+              >
+                {groupBy === 'platform' && <span className="mr-2">✓</span>}
+                Group by Platform
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => setGroupBy('month')}
@@ -462,14 +611,16 @@ export function WinsTracker({ view = 'table' }: WinsTrackerProps) {
                     <TableRow>
                       <TableHead>Title</TableHead>
                       <TableHead>Category</TableHead>
+                      <TableHead>Sub-Categories</TableHead>
+                      <TableHead>Platform</TableHead>
                       <TableHead>Date</TableHead>
-                      <TableHead className="w-[100px]">Actions</TableHead>
+                      <TableHead className="w-[150px]">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {sortedWins.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={4} className="h-24 text-center">
+                        <TableCell colSpan={6} className="h-24 text-center">
                           No wins found. Try adjusting your filters or adding new wins.
                         </TableCell>
                       </TableRow>
@@ -489,11 +640,6 @@ export function WinsTracker({ view = 'table' }: WinsTrackerProps) {
                               </a>
                               {win.isFavorite && <Star className="h-3 w-3 text-yellow-500" />}
                             </div>
-                            {win.desc && (
-                              <p className="mt-1 text-xs text-muted-foreground line-clamp-1">
-                                {win.desc}
-                              </p>
-                            )}
                           </TableCell>
                           <TableCell>
                             <div className="flex flex-wrap gap-1">
@@ -508,26 +654,77 @@ export function WinsTracker({ view = 'table' }: WinsTrackerProps) {
                             </div>
                           </TableCell>
                           <TableCell>
+                            <div className="flex flex-wrap gap-1">
+                              {win.subCategories.split(',').map((subCat, idx) => (
+                                <span 
+                                  key={idx} 
+                                  className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-muted/60"
+                                >
+                                  {subCat.trim()}
+                                </span>
+                              ))}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-muted/30">
+                              {win.platform}
+                            </span>
+                          </TableCell>
+                          <TableCell>
                             {win.date.toLocaleDateString()}
                           </TableCell>
                           <TableCell>
                             <div className="flex space-x-1">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => toggleFavorite(win.id)}
-                                title={win.isFavorite ? "Remove from favorites" : "Add to favorites"}
-                              >
-                                <Star className={`h-4 w-4 ${win.isFavorite ? "text-yellow-500 fill-yellow-500" : ""}`} />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => toggleArchive(win.id)}
-                                title="Archive win"
-                              >
-                                <Archive className="h-4 w-4" />
-                              </Button>
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      onClick={() => setSelectedSummary(win.summary)}
+                                    >
+                                      <FileText className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>View Summary</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                              
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      onClick={() => toggleFavorite(win.id)}
+                                    >
+                                      <Star className={`h-4 w-4 ${win.isFavorite ? "text-yellow-500 fill-yellow-500" : ""}`} />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>{win.isFavorite ? "Remove from favorites" : "Add to favorites"}</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                              
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      onClick={() => toggleArchive(win.id)}
+                                    >
+                                      <Archive className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>Archive win</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
                             </div>
                           </TableCell>
                         </TableRow>
@@ -559,11 +756,6 @@ export function WinsTracker({ view = 'table' }: WinsTrackerProps) {
                                   </a>
                                   {win.isFavorite && <Star className="h-3 w-3 text-yellow-500" />}
                                 </div>
-                                {win.desc && (
-                                  <p className="mt-1 text-xs text-muted-foreground line-clamp-1">
-                                    {win.desc}
-                                  </p>
-                                )}
                               </TableCell>
                               <TableCell>
                                 <div className="flex flex-wrap gap-1">
@@ -578,6 +770,23 @@ export function WinsTracker({ view = 'table' }: WinsTrackerProps) {
                                 </div>
                               </TableCell>
                               <TableCell>
+                                <div className="flex flex-wrap gap-1">
+                                  {win.subCategories.split(',').map((subCat, idx) => (
+                                    <span 
+                                      key={idx} 
+                                      className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-muted/60"
+                                    >
+                                      {subCat.trim()}
+                                    </span>
+                                  ))}
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-muted/30">
+                                  {win.platform}
+                                </span>
+                              </TableCell>
+                              <TableCell>
                                 {win.date.toLocaleDateString()}
                               </TableCell>
                               <TableCell>
@@ -585,8 +794,14 @@ export function WinsTracker({ view = 'table' }: WinsTrackerProps) {
                                   <Button
                                     variant="ghost"
                                     size="icon"
+                                    onClick={() => setSelectedSummary(win.summary)}
+                                  >
+                                    <FileText className="h-4 w-4" />
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
                                     onClick={() => toggleFavorite(win.id)}
-                                    title={win.isFavorite ? "Remove from favorites" : "Add to favorites"}
                                   >
                                     <Star className={`h-4 w-4 ${win.isFavorite ? "text-yellow-500 fill-yellow-500" : ""}`} />
                                   </Button>
@@ -594,7 +809,6 @@ export function WinsTracker({ view = 'table' }: WinsTrackerProps) {
                                     variant="ghost"
                                     size="icon"
                                     onClick={() => toggleArchive(win.id)}
-                                    title="Archive win"
                                   >
                                     <Archive className="h-4 w-4" />
                                   </Button>
@@ -633,7 +847,9 @@ export function WinsTracker({ view = 'table' }: WinsTrackerProps) {
                     <span>•</span>
                     <span>{win.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
                   </div>
-                  {win.desc && <p className="text-sm line-clamp-2">{win.desc}</p>}
+                  {win.summary && (
+                    <p className="text-sm line-clamp-2">{win.summary}</p>
+                  )}
                 </div>
               ))
             )}
@@ -666,6 +882,21 @@ export function WinsTracker({ view = 'table' }: WinsTrackerProps) {
           </CardContent>
         </Card>
       </div>
+      
+      {/* Summary Dialog */}
+      <AlertDialog open={!!selectedSummary} onOpenChange={() => setSelectedSummary(null)}>
+        <AlertDialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Win Summary</AlertDialogTitle>
+          </AlertDialogHeader>
+          <AlertDialogDescription className="whitespace-pre-line text-base text-foreground">
+            {selectedSummary}
+          </AlertDialogDescription>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Close</AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
