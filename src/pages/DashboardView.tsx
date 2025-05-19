@@ -1,4 +1,3 @@
-
 import React, { useMemo, useEffect, useState } from 'react';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -218,7 +217,7 @@ const DashboardView = () => {
     return { current: currentStreak, longest: longestStreak };
   }, [activeWins]);
 
-  // Extract common themes/keywords ONLY from title and description fields
+  // Extract common themes/keywords ONLY from title and description fields with enhanced filtering
   const commonKeywords = useMemo(() => {
     if (!activeWins.length) return [];
     
@@ -227,21 +226,44 @@ const DashboardView = () => {
       `${win.title || ''} ${win.desc || ''}`
     ).join(' ').toLowerCase();
     
-    // Remove common stop words and short words
+    // Extended stopwords list including web/tech terms that aren't meaningful
     const stopWords = [
+      // Basic stopwords
       'the', 'and', 'a', 'to', 'in', 'with', 'of', 'for', 'on', 'at', 'from', 'by', 
       'is', 'are', 'was', 'were', 'will', 'would', 'should', 'can', 'could',
       'has', 'have', 'had', 'not', 'be', 'been', 'being', 'as', 'if', 'or',
       'this', 'that', 'these', 'those', 'it', 'its', 'they', 'them', 'their',
       'who', 'whom', 'whose', 'what', 'which', 'when', 'where', 'why', 'how',
       'all', 'any', 'both', 'each', 'few', 'more', 'most', 'some', 'such',
-      'no', 'nor', 'too', 'very', 'just', 'but'
+      'no', 'nor', 'too', 'very', 'just', 'but',
+      
+      // Web/tech related terms to exclude
+      'http', 'https', 'www', 'com', 'net', 'org', 'io', 'html', 'css',
+      'google', 'docs', 'doc', 'sheet', 'sheets', 'drive', 'document',
+      'tab', 'edit', 'view', 'file', 'folder', 'click', 'email', 'url',
+      'link', 'href', 'browser', 'window', 'site', 'page', 'login'
     ];
     
     // Split by non-word characters and filter
-    const words = allText.split(/\W+/).filter(word => 
-      word.length > 2 && !stopWords.includes(word) && isNaN(Number(word))
-    );
+    const words = allText.split(/\W+/).filter(word => {
+      // Skip words that are:
+      // 1. Too short
+      if (word.length <= 3) return false;
+      
+      // 2. In the stopwords list
+      if (stopWords.includes(word)) return false;
+      
+      // 3. Numeric
+      if (!isNaN(Number(word))) return false;
+      
+      // 4. Looks like an ID or hash (alphanumeric with unusual length or pattern)
+      if (/^[a-z0-9_-]{10,}$/i.test(word)) return false;
+      
+      // 5. Contains numbers and letters mixed (often IDs or codes)
+      if (/^(?=.*[0-9])(?=.*[a-zA-Z])[a-zA-Z0-9]+$/.test(word)) return false;
+      
+      return true;
+    });
     
     // Count word frequencies
     const wordCounts: Record<string, number> = {};
@@ -376,24 +398,25 @@ const DashboardView = () => {
         <Card className="lg:col-span-4">
           <CardHeader>
             <CardTitle>Common Themes</CardTitle>
-            <p className="text-sm text-muted-foreground">Frequently mentioned keywords in titles and descriptions</p>
+            <p className="text-sm text-muted-foreground">Meaningful keywords from titles and descriptions</p>
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2 justify-center">
-              {commonKeywords.map((keyword, index) => (
-                <div 
-                  key={keyword}
-                  className="px-3 py-1.5 bg-muted/30 rounded-full text-sm"
-                  style={{ 
-                    fontSize: `${Math.max(0.8, Math.min(1.4, 0.8 + Math.random() * 0.6))}rem`,
-                    opacity: Math.max(0.6, Math.min(1, 0.6 + Math.random() * 0.4))
-                  }}
-                >
-                  {keyword}
-                </div>
-              ))}
-              {commonKeywords.length === 0 && (
-                <div className="text-muted-foreground text-sm">No common keywords found</div>
+              {commonKeywords.length > 0 ? (
+                commonKeywords.map((keyword, index) => (
+                  <div 
+                    key={keyword}
+                    className="px-3 py-1.5 bg-muted/30 rounded-full text-sm"
+                    style={{ 
+                      fontSize: `${Math.max(0.8, Math.min(1.4, 0.8 + Math.random() * 0.6))}rem`,
+                      opacity: Math.max(0.6, Math.min(1, 0.6 + Math.random() * 0.4))
+                    }}
+                  >
+                    {keyword}
+                  </div>
+                ))
+              ) : (
+                <div className="text-muted-foreground text-sm">No meaningful keywords found</div>
               )}
             </div>
           </CardContent>
