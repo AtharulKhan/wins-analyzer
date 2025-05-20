@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useMemo } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useLocalStorage } from '@/hooks/use-local-storage';
@@ -35,7 +34,7 @@ export function useWinsData() {
       
       if (data.values && data.values.length) {
         const parsedWins: Win[] = data.values.map((row: string[], index: number) => {
-          const [title, category, subCategories, summary, platform, dateStr, link] = row;
+          const [title, category, subCategories, summary, platform, dateStr, linkText, linkUrl] = row;
           const id = `win-${index}-${dateStr}`;
           return {
             id,
@@ -45,7 +44,7 @@ export function useWinsData() {
             summary: summary || '',
             platform: platform || '',
             date: dateStr ? new Date(dateStr) : new Date(),
-            link: link || '',
+            link: linkUrl || '', // Use column H (linkUrl) for the link
             isFavorite: favorites.includes(id),
             isArchived: archived.includes(id)
           };

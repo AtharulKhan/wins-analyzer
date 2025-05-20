@@ -8,8 +8,6 @@ export interface Win {
   platform: string;
   date: Date;
   link: string;
-  isFavorite?: boolean;
-  isArchived?: boolean;
 }
 
 export interface WinsTrackerProps {
@@ -24,4 +22,4 @@ export interface SortOption {
 // Google Sheets API configuration
 export const GOOGLE_SHEETS_API_KEY = 'AIzaSyDsoN29aqbA8yJPVoORiTemvl21ft1zBls';
 export const GOOGLE_SHEETS_ID = '1zx957CNpMus2IOY17j0TIt5yopSWs1v3AkAf7TSnExw';
-export const GOOGLE_SHEETS_RANGE = 'Master!A2:G';
+export const GOOGLE_SHEETS_RANGE = 'Master!A2:H'; // Updated to include column H
