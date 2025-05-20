@@ -1,6 +1,7 @@
+
 import React, { useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
-import { Heart, Eye, ChevronDown, ChevronUp } from 'lucide-react';
+import { Link, Eye, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { TableRow, TableCell } from '@/components/ui/table';
@@ -29,6 +30,13 @@ export function WinItem({ win, toggleFavorite, toggleArchive, viewSummary, isMob
   // Determine if we should show the "show more" button
   const hasMultipleSubCategories = subCategoriesArray.length > 2;
   const visibleSubCategories = showAllSubCategories ? subCategoriesArray : subCategoriesArray.slice(0, 2);
+  
+  // Function to open the link
+  const openLink = () => {
+    if (win.link) {
+      window.open(win.link, '_blank', 'noopener,noreferrer');
+    }
+  };
   
   if (isMobile) {
     return (
@@ -84,11 +92,12 @@ export function WinItem({ win, toggleFavorite, toggleArchive, viewSummary, isMob
           <Button 
             variant="ghost" 
             size="sm" 
-            onClick={() => toggleFavorite(win.id)}
-            className={`${win.isFavorite ? "text-red-500" : ""} text-xs px-1`}
+            onClick={openLink}
+            className="text-xs px-1"
+            disabled={!win.link}
           >
-            <Heart className="h-3 w-3 mr-1" />
-            {win.isFavorite ? "Favorited" : "Favorite"}
+            <Link className="h-3 w-3 mr-1" />
+            View Link
           </Button>
           
           <Button 
@@ -148,10 +157,11 @@ export function WinItem({ win, toggleFavorite, toggleArchive, viewSummary, isMob
           <Button 
             variant="ghost" 
             size="icon" 
-            onClick={() => toggleFavorite(win.id)}
-            className={win.isFavorite ? "text-red-500" : ""}
+            onClick={openLink}
+            disabled={!win.link}
+            title={win.link ? "Open link" : "No link available"}
           >
-            <Heart className="h-4 w-4" />
+            <Link className="h-4 w-4" />
           </Button>
           
           <Button 
