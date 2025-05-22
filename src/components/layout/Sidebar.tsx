@@ -2,7 +2,7 @@
 import React from 'react';
 import { 
   ChevronRight, ChevronLeft, 
-  LayoutList, Kanban, Calendar, BarChart, Settings
+  LayoutList, BarChart, Settings
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -24,16 +24,6 @@ export function Sidebar({ isCollapsed, onToggle, className }: SidebarProps) {
       title: 'Table View',
       icon: LayoutList,
       href: '/',
-    },
-    {
-      title: 'Kanban View',
-      icon: Kanban,
-      href: '/kanban',
-    },
-    {
-      title: 'Calendar View',
-      icon: Calendar,
-      href: '/calendar',
     },
     {
       title: 'Dashboard',
