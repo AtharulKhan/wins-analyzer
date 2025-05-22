@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { useSearch } from '@/context/SearchContext';
 
 interface NavbarProps {
   className?: string;
@@ -15,6 +16,8 @@ export function Navbar({
   className,
   children
 }: NavbarProps) {
+  const { globalSearch, setGlobalSearch } = useSearch();
+  
   return <header className={cn("bg-background/95 backdrop-blur-sm sticky top-0 z-30 border-b", className)}>
       <div className="container flex items-center justify-between h-16 px-4">
         <div className="flex items-center gap-2 lg:gap-4">
@@ -23,7 +26,13 @@ export function Navbar({
           
           <div className="relative hidden md:flex items-center h-9 rounded-md px-3 text-muted-foreground focus-within:text-foreground bg-muted/50">
             <Search className="h-4 w-4 mr-2" />
-            <Input type="search" placeholder="Search for wins" className="h-9 w-[200px] lg:w-[280px] bg-transparent border-none px-0 py-0 shadow-none focus-visible:ring-0 placeholder:text-muted-foreground" />
+            <Input 
+              type="search" 
+              placeholder="Search for wins" 
+              className="h-9 w-[200px] lg:w-[280px] bg-transparent border-none px-0 py-0 shadow-none focus-visible:ring-0 placeholder:text-muted-foreground" 
+              value={globalSearch}
+              onChange={(e) => setGlobalSearch(e.target.value)}
+            />
           </div>
         </div>
         

@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { SearchBar } from './SearchBar';
 import { FilterPopover } from './FilterPopover';
@@ -10,6 +10,7 @@ import { SummaryDialog } from './SummaryDialog';
 import { useWinsData } from './useWinsData';
 import { WinsTrackerProps } from './types';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useSearch } from '@/context/SearchContext';
 import {
   Drawer,
   DrawerTrigger,
@@ -20,6 +21,8 @@ import { Filter, SortAsc } from 'lucide-react';
 
 export function WinsTracker({ view = 'table' }: WinsTrackerProps) {
   const isMobile = useIsMobile();
+  const { globalSearch } = useSearch();
+  
   const {
     loading,
     search,
@@ -49,6 +52,11 @@ export function WinsTracker({ view = 'table' }: WinsTrackerProps) {
     toggleArchive,
     resetFilters
   } = useWinsData();
+  
+  // Sync global search with local search
+  useEffect(() => {
+    setSearch(globalSearch);
+  }, [globalSearch, setSearch]);
   
   // Mobile components
   const MobileFilterBar = () => (
