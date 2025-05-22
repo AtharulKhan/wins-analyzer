@@ -23,7 +23,7 @@ export function Navbar({
           
           <div className="relative hidden md:flex items-center h-9 rounded-md px-3 text-muted-foreground focus-within:text-foreground bg-muted/50">
             <Search className="h-4 w-4 mr-2" />
-            <Input type="search" placeholder="Search stocks, indices..." className="h-9 w-[200px] lg:w-[280px] bg-transparent border-none px-0 py-0 shadow-none focus-visible:ring-0 placeholder:text-muted-foreground" />
+            <Input type="search" placeholder="Search for wins" className="h-9 w-[200px] lg:w-[280px] bg-transparent border-none px-0 py-0 shadow-none focus-visible:ring-0 placeholder:text-muted-foreground" />
           </div>
         </div>
         
