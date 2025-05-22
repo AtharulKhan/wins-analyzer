@@ -8,6 +8,8 @@ export interface Win {
   platform: string;
   date: Date;
   link: string;
+  isFavorite?: boolean;
+  isArchived?: boolean;
 }
 
 export interface WinsTrackerProps {
