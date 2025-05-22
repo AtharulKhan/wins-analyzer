@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { 
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line,
-  PieChart, Pie, Cell, Legend, CartesianGrid
+  PieChart, Pie, Cell, Legend, CartesianGrid, ScatterChart, Scatter, ZAxis
 } from 'recharts';
 import { CalendarDays, ChartPieIcon, TrendingUp, Clock, ChartLine, FileText } from 'lucide-react';
 import { StatsCard } from '@/components/ui/StatsCard';
@@ -98,7 +98,7 @@ const DashboardView = () => {
     return Array.isArray(wins) ? wins.filter(win => !archived.includes(win.id)) : [];
   }, [wins, archived]);
 
-  // Get category data
+  // Get category data with enhanced bubble chart format
   const categoryData = useMemo(() => {
     // Count occurrences of each category
     const categories: Record<string, number> = {};
@@ -120,19 +120,25 @@ const DashboardView = () => {
       .map(([name, value]) => ({ name, value }))
       .sort((a, b) => b.value - a.value);
     
-    // Assign colors
-    const colors = ['#8B5CF6', '#D946EF', '#F97316', '#0EA5E9', '#22C55E', '#EAB308', '#EC4899', '#06B6D4'];
+    // Assign colors and calculate sizes for bubble chart
+    const colors = [
+      '#8B5CF6', '#D946EF', '#F97316', '#0EA5E9', '#22C55E', 
+      '#EAB308', '#EC4899', '#06B6D4', '#9b87f5', '#7E69AB', 
+      '#6E59A5', '#D6BCFA', '#33C3F0', '#ea384c'
+    ];
     
     return categoryArray.map((category, index) => ({
       ...category,
-      fill: colors[index % colors.length]
+      fill: colors[index % colors.length],
+      // Normalize size for bubble chart (min size 20, max size 60)
+      z: Math.max(20, Math.min(60, category.value * 5))
     }));
   }, [activeWins]);
 
-  // Handle pie chart slice click
-  const handlePieClick = (data: any, index: number) => {
-    if (data && data.name) {
-      const category = data.name;
+  // Handle bubble click (similar to pie click)
+  const handleBubbleClick = (data: any) => {
+    if (data && data.payload && data.payload.name) {
+      const category = data.payload.name;
       // Find all wins with this category
       const winsInCategory = activeWins.filter(win => {
         const categories = win.category.split(',').map(cat => cat.trim());
@@ -313,6 +319,9 @@ const DashboardView = () => {
   }, [activeWins]);
 
   const chartConfig = {
+    categoryBubble: {
+      color: '#8B5CF6',
+    },
     categoryBar: {
       color: '#8B5CF6',
     },
@@ -360,6 +369,9 @@ const DashboardView = () => {
       </text>
     );
   };
+
+  // Custom domain for z-axis to control bubble size
+  const zAxisDomain = [0, Math.max(...categoryData.map(item => item.value)) * 1.2];
 
   return (
     <PageLayout title="Dashboard">
@@ -409,36 +421,37 @@ const DashboardView = () => {
           />
         ))}
 
-        {/* Wins by Category Pie Chart */}
+        {/* Wins by Category Bubble Chart */}
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle>Wins by Category</CardTitle>
-            <p className="text-sm text-muted-foreground">Distribution of your achievements</p>
+            <p className="text-sm text-muted-foreground">Size represents number of wins in each category</p>
           </CardHeader>
           <CardContent>
             <div className="h-64">
               <ChartContainer config={chartConfig}>
                 <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={categoryData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={renderCustomizedLabel}
-                      outerRadius={80}
+                  <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+                    <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
+                    <XAxis type="category" dataKey="name" name="Category" />
+                    <YAxis type="number" dataKey="value" name="Count" />
+                    <ZAxis type="number" dataKey="z" range={[20, 60]} domain={zAxisDomain} />
+                    <Tooltip 
+                      content={<ChartTooltipContent />}
+                      cursor={{ strokeDasharray: '3 3' }}
+                    />
+                    <Scatter 
+                      name="Categories" 
+                      data={categoryData} 
                       fill="#8884d8"
-                      dataKey="value"
-                      onClick={handlePieClick}
+                      onClick={handleBubbleClick}
                       className="cursor-pointer"
                     >
                       {categoryData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.fill} />
                       ))}
-                    </Pie>
-                    <Legend content={<ChartLegendContent />} />
-                    <Tooltip content={<ChartTooltipContent />} />
-                  </PieChart>
+                    </Scatter>
+                  </ScatterChart>
                 </ResponsiveContainer>
               </ChartContainer>
             </div>
