@@ -1,4 +1,3 @@
-
 import React, { useMemo, useEffect, useState } from 'react';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,6 +11,12 @@ import { CalendarDays, ChartPieIcon, TrendingUp, Clock, ChartLine, FileText } fr
 import { StatsCard } from '@/components/ui/StatsCard';
 import { ChartContainer, ChartTooltipContent, ChartLegendContent } from "@/components/ui/chart";
 import { useLocalStorage } from '@/hooks/use-local-storage';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 // Hard-coded Google Sheets API values
 const GOOGLE_SHEETS_API_KEY = 'AIzaSyDsoN29aqbA8yJPVoORiTemvl21ft1zBls';
@@ -33,6 +38,9 @@ const DashboardView = () => {
   
   const [wins, setWins] = useState<Win[]>([]);
   const [loading, setLoading] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [categoryWins, setCategoryWins] = useState<Win[]>([]);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   // Fetch data from Google Sheets
   const fetchData = async () => {
@@ -120,6 +128,22 @@ const DashboardView = () => {
       fill: colors[index % colors.length]
     }));
   }, [activeWins]);
+
+  // Handle pie chart slice click
+  const handlePieClick = (data: any, index: number) => {
+    if (data && data.name) {
+      const category = data.name;
+      // Find all wins with this category
+      const winsInCategory = activeWins.filter(win => {
+        const categories = win.category.split(',').map(cat => cat.trim());
+        return categories.includes(category);
+      });
+      
+      setSelectedCategory(category);
+      setCategoryWins(winsInCategory);
+      setDialogOpen(true);
+    }
+  };
 
   // Get top categories (top 3)
   const topCategories = useMemo(() => {
@@ -405,6 +429,8 @@ const DashboardView = () => {
                       outerRadius={80}
                       fill="#8884d8"
                       dataKey="value"
+                      onClick={handlePieClick}
+                      className="cursor-pointer"
                     >
                       {categoryData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.fill} />
@@ -556,6 +582,45 @@ const DashboardView = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Category Wins Dialog */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {selectedCategory ? `Wins in "${selectedCategory}" (${categoryWins.length})` : 'Category Wins'}
+            </DialogTitle>
+          </DialogHeader>
+          
+          {categoryWins.length === 0 ? (
+            <div className="p-6 text-center">
+              <p className="text-muted-foreground">No wins found in this category.</p>
+            </div>
+          ) : (
+            <div className="space-y-4 p-2">
+              {categoryWins.map((win) => (
+                <div key={win.id} className="border-b pb-3 last:border-b-0">
+                  <h3 className="font-medium text-lg">{win.title}</h3>
+                  <div className="flex gap-2 text-sm text-muted-foreground mb-2">
+                    <span>{new Date(win.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+                  </div>
+                  {win.desc && <p className="text-sm">{win.desc}</p>}
+                  {win.link && (
+                    <a 
+                      href={win.link} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-sm text-primary hover:underline mt-2 inline-block"
+                    >
+                      View Details
+                    </a>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </PageLayout>
   );
 };
