@@ -24,11 +24,11 @@ export const TimeSeriesChart: React.FC<TimeSeriesChartProps> = ({
         <CardTitle>Wins Over Time</CardTitle>
         <p className="text-sm text-muted-foreground">Last 6 months activity</p>
       </CardHeader>
-      <CardContent>
-        <div className="h-64 w-full">
+      <CardContent className="p-0 pb-4">
+        <div className="h-[300px] w-full px-4">
           <ChartContainer config={chartConfig}>
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={timeSeriesData}>
+              <LineChart data={timeSeriesData} margin={{ top: 10, right: 10, bottom: 10, left: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="month" />
                 <YAxis />
