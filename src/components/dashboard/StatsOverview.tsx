@@ -19,7 +19,7 @@ export const StatsOverview: React.FC<StatsOverviewProps> = ({
   topCategories 
 }) => {
   return (
-    <>
+    <div className="lg:col-span-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
       {/* Stats Cards Row */}
       <StatsCard
         title="Total Wins"
@@ -64,6 +64,6 @@ export const StatsOverview: React.FC<StatsOverviewProps> = ({
           className="bg-secondary/5"
         />
       ))}
-    </>
+    </div>
   );
 };
