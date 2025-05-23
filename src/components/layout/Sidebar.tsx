@@ -21,9 +21,14 @@ export function Sidebar({ isCollapsed, onToggle, className }: SidebarProps) {
   // Navigation items for the wins tracker app
   const navItems = [
     {
-      title: 'Table View',
+      title: 'Finished Projects',
       icon: LayoutList,
       href: '/',
+    },
+    {
+      title: 'Project Ideas (To Do)',
+      icon: LayoutList,
+      href: '/project-ideas',
     },
     {
       title: 'Dashboard',

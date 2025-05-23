@@ -11,6 +11,7 @@ import Settings from "./pages/Settings";
 import KanbanView from "./pages/KanbanView";
 import CalendarView from "./pages/CalendarView";
 import DashboardView from "./pages/DashboardView";
+import ProjectIdeasView from "@/pages/ProjectIdeasView";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,7 @@ const App = () => (
             <Route path="/kanban" element={<KanbanView />} />
             <Route path="/calendar" element={<CalendarView />} />
             <Route path="/dashboard" element={<DashboardView />} />
+            <Route path="/project-ideas" element={<ProjectIdeasView />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
