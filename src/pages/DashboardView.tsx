@@ -55,32 +55,41 @@ const DashboardView = () => {
 
   return (
     <PageLayout title="Dashboard">
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Stats Overview Cards */}
         <StatsOverview winsByPeriod={winsByPeriod} topCategories={topCategories} />
 
-        {/* Category Bubble Chart */}
-        <CategoryBubbleChart 
-          categoryData={categoryData} 
-          handleBubbleClick={handleBubbleClick} 
-          zAxisDomain={zAxisDomain}
-          chartConfig={chartConfig} 
-        />
+        {/* Charts Section */}
+        <div className="md:col-span-2 lg:col-span-2">
+          <CategoryBubbleChart 
+            categoryData={categoryData} 
+            handleBubbleClick={handleBubbleClick} 
+            zAxisDomain={zAxisDomain}
+            chartConfig={chartConfig} 
+          />
+        </div>
 
-        {/* Activity Timeline */}
-        <ActivityTimeline winsByPeriod={winsByPeriod} />
+        <div className="md:col-span-2 lg:col-span-2">
+          <ActivityTimeline winsByPeriod={winsByPeriod} />
+        </div>
 
-        {/* Time Series Chart */}
-        <TimeSeriesChart timeSeriesData={timeSeriesData} chartConfig={chartConfig} />
+        <div className="md:col-span-2 lg:col-span-2">
+          <TimeSeriesChart timeSeriesData={timeSeriesData} chartConfig={chartConfig} />
+        </div>
 
-        {/* Cumulative Chart */}
-        <CumulativeChart cumulativeWinsData={cumulativeWinsData} chartConfig={chartConfig} />
+        <div className="md:col-span-2 lg:col-span-2">
+          <CumulativeChart cumulativeWinsData={cumulativeWinsData} chartConfig={chartConfig} />
+        </div>
 
-        {/* Theme Cloud */}
-        <ThemeCloud commonKeywords={commonKeywords} />
+        {/* Theme Cloud - Full Width */}
+        <div className="md:col-span-2 lg:col-span-4">
+          <ThemeCloud commonKeywords={commonKeywords} />
+        </div>
 
-        {/* Export Button */}
-        <ExportButton />
+        {/* Export Button - Full Width */}
+        <div className="md:col-span-2 lg:col-span-4">
+          <ExportButton />
+        </div>
       </div>
 
       {/* Category Wins Dialog */}

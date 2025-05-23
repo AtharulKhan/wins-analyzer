@@ -15,7 +15,7 @@ export const ActivityTimeline: React.FC<ActivityTimelineProps> = ({
   winsByPeriod 
 }) => {
   return (
-    <Card className="lg:col-span-2">
+    <Card className="w-full h-full">
       <CardHeader>
         <CardTitle>Time Period Activity</CardTitle>
         <p className="text-sm text-muted-foreground">Your wins over different time periods</p>

@@ -11,7 +11,7 @@ export const ThemeCloud: React.FC<ThemeCloudProps> = ({
   commonKeywords 
 }) => {
   return (
-    <Card className="lg:col-span-4">
+    <Card className="w-full">
       <CardHeader>
         <CardTitle>Common Themes</CardTitle>
         <p className="text-sm text-muted-foreground">Meaningful keywords from titles and descriptions</p>

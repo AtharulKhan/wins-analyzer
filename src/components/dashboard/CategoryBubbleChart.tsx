@@ -27,13 +27,13 @@ export const CategoryBubbleChart: React.FC<CategoryBubbleChartProps> = ({
   chartConfig 
 }) => {
   return (
-    <Card className="lg:col-span-2">
+    <Card className="w-full h-full">
       <CardHeader>
         <CardTitle>Wins by Category</CardTitle>
         <p className="text-sm text-muted-foreground">Size represents number of wins in each category</p>
       </CardHeader>
       <CardContent>
-        <div className="h-64">
+        <div className="h-64 w-full">
           <ChartContainer config={chartConfig}>
             <ResponsiveContainer width="100%" height="100%">
               <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>

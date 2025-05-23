@@ -19,13 +19,13 @@ export const TimeSeriesChart: React.FC<TimeSeriesChartProps> = ({
   chartConfig 
 }) => {
   return (
-    <Card className="lg:col-span-2">
+    <Card className="w-full h-full">
       <CardHeader>
         <CardTitle>Wins Over Time</CardTitle>
         <p className="text-sm text-muted-foreground">Last 6 months activity</p>
       </CardHeader>
       <CardContent>
-        <div className="h-64">
+        <div className="h-64 w-full">
           <ChartContainer config={chartConfig}>
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={timeSeriesData}>
