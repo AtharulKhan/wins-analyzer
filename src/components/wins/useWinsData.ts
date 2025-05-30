@@ -268,6 +268,33 @@ export function useWinsData() {
       .sort((a, b) => b.count - a.count);
   }, [wins]);
 
+  // Get subcategory breakdown data for chart
+  const subCategoryBreakdown = useMemo(() => {
+    const counts: Record<string, number> = {};
+    const activeWins = wins.filter(win => !win.isArchived);
+    
+    activeWins.forEach(win => {
+      if (win.subCategories) {
+        win.subCategories.split(',').forEach(subCategory => {
+          const subCat = subCategory.trim();
+          if (subCat) {
+            counts[subCat] = (counts[subCat] || 0) + 1;
+          }
+        });
+      }
+    });
+    
+    const total = Object.values(counts).reduce((sum, count) => sum + count, 0);
+    
+    return Object.entries(counts)
+      .map(([subCategory, count]) => ({
+        subCategory,
+        count,
+        percentage: total > 0 ? Math.round((count / total) * 100) : 0
+      }))
+      .sort((a, b) => b.count - a.count);
+  }, [wins]);
+
   const toggleFavorite = (id: string) => {
     setFavorites(prev => {
       if (prev.includes(id)) {
@@ -336,6 +363,7 @@ export function useWinsData() {
     groupedWins,
     recentWins,
     categoryBreakdown,
+    subCategoryBreakdown,
     toggleFavorite,
     toggleArchive,
     resetFilters

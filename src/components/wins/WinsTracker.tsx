@@ -48,6 +48,7 @@ export function WinsTracker({ view = 'table' }: WinsTrackerProps) {
     groupedWins,
     recentWins,
     categoryBreakdown,
+    subCategoryBreakdown,
     toggleFavorite,
     toggleArchive,
     resetFilters
@@ -197,6 +198,7 @@ export function WinsTracker({ view = 'table' }: WinsTrackerProps) {
         <div className="w-full lg:w-80 space-y-4">
           <RecentWins wins={recentWins} />
           <CategoryBreakdown breakdown={categoryBreakdown} />
+          <SubCategoryBreakdown breakdown={subCategoryBreakdown} />
         </div>
       )}
       

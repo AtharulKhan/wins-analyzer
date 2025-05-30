@@ -75,3 +75,42 @@ export function CategoryBreakdown({ breakdown }: CategoryBreakdownProps) {
     </Card>
   );
 }
+
+interface SubCategoryBreakdownItem {
+  subCategory: string;
+  count: number;
+  percentage: number;
+}
+
+interface SubCategoryBreakdownProps {
+  breakdown: SubCategoryBreakdownItem[];
+}
+
+export function SubCategoryBreakdown({ breakdown }: SubCategoryBreakdownProps) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-lg">SubCategory Breakdown</CardTitle>
+        <p className="text-sm text-muted-foreground">Distribution by subcategories</p>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-2">
+          {breakdown.map(({ subCategory, count, percentage }) => (
+            <div key={subCategory}>
+              <div className="flex justify-between text-sm">
+                <span>{subCategory}</span>
+                <span>{count} ({percentage}%)</span>
+              </div>
+              <div className="w-full bg-muted rounded-full h-2">
+                <div 
+                  className="bg-secondary h-2 rounded-full" 
+                  style={{ width: `${percentage}%` }}
+                ></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
