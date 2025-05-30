@@ -5,7 +5,7 @@ import { SearchBar } from './SearchBar';
 import { FilterPopover } from './FilterPopover';
 import { SortMenu } from './SortMenu';
 import { WinsList } from './WinsList';
-import { RecentWins, CategoryBreakdown } from './WinStats';
+import { RecentWins, CategoryBreakdown, SubCategoryBreakdown } from './WinStats';
 import { SummaryDialog } from './SummaryDialog';
 import { useWinsData } from './useWinsData';
 import { WinsTrackerProps } from './types';
