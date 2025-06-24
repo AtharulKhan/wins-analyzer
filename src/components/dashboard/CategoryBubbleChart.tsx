@@ -33,9 +33,9 @@ export const CategoryBubbleChart: React.FC<CategoryBubbleChartProps> = ({
         <p className="text-sm text-muted-foreground">Size represents number of wins in each category</p>
       </CardHeader>
       <CardContent className="p-0 pb-4">
-        <div className="h-[300px] w-full px-4">
-          <ChartContainer config={chartConfig}>
-            <ResponsiveContainer width="100%" height="100%">
+        <div className="h-[300px] w-full px-4 overflow-hidden">
+          <ChartContainer config={chartConfig} className="w-full h-full">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
               <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
                 <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
                 <XAxis type="category" dataKey="name" name="Category" />
