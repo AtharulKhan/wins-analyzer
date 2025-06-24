@@ -25,9 +25,9 @@ export const TimeSeriesChart: React.FC<TimeSeriesChartProps> = ({
         <p className="text-sm text-muted-foreground">Last 6 months activity</p>
       </CardHeader>
       <CardContent className="p-0 pb-4">
-        <div className="h-[300px] w-full px-4">
-          <ChartContainer config={chartConfig}>
-            <ResponsiveContainer width="100%" height="100%">
+        <div className="h-[300px] w-full px-4 overflow-hidden">
+          <ChartContainer config={chartConfig} className="w-full h-full">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
               <LineChart data={timeSeriesData} margin={{ top: 10, right: 10, bottom: 10, left: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="month" />
