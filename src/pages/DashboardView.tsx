@@ -14,7 +14,6 @@ import { CategoryBubbleChart } from '@/components/dashboard/CategoryBubbleChart'
 import { TimeSeriesChart } from '@/components/dashboard/TimeSeriesChart';
 import { CumulativeChart } from '@/components/dashboard/CumulativeChart';
 import { CategoryWinsDialog } from '@/components/dashboard/CategoryWinsDialog';
-import { ExportButton } from '@/components/dashboard/ExportButton';
 
 const DashboardView = () => {
   // Fetch and process data using hooks
@@ -76,11 +75,6 @@ const DashboardView = () => {
 
         <div className="md:col-span-2 lg:col-span-2">
           <CumulativeChart cumulativeWinsData={cumulativeWinsData} chartConfig={chartConfig} />
-        </div>
-
-        {/* Export Button - Full Width */}
-        <div className="md:col-span-2 lg:col-span-4">
-          <ExportButton />
         </div>
       </div>
 
