@@ -58,7 +58,21 @@ export function PageLayout({ children, title }: PageLayoutProps) {
           </Sheet>
         )}
         
-        <main className="flex-1 transition-all duration-300">
+        <main className="flex-1 transition-all duration-300 relative">
+          {/* Mobile menu button positioned at top-left when navbar is removed */}
+          {isMobile && (
+            <div className="absolute top-4 left-4 z-10">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-9 w-9 rounded-lg bg-white/80 dark:bg-slate-800/80 shadow-sm hover:shadow-md border border-slate-200/60 dark:border-slate-700/60 transition-all duration-200" 
+                onClick={() => setMobileMenuOpen(true)}
+              >
+                <Menu className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+          
           <div className="container max-w-full p-6 lg:p-8 animate-fade-in-up space-y-8">
             <div className="flex items-center gap-3 mb-8">
               <div className="w-2 h-8 bg-gradient-to-b from-primary to-primary/60 rounded-full shadow-sm"></div>
