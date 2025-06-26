@@ -22,7 +22,7 @@ export function PageLayout({ children, title }: PageLayoutProps) {
   };
   
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 via-white to-slate-50/50">
       <Navbar>
         {isMobile && (
           <Button 
@@ -52,8 +52,11 @@ export function PageLayout({ children, title }: PageLayoutProps) {
         )}
         
         <main className="flex-1 transition-all duration-300">
-          <div className="container max-w-full p-4 lg:p-6 animate-fade-in">
-            <h1 className="text-2xl font-bold mb-6">{title}</h1>
+          <div className="container max-w-full p-6 lg:p-8 animate-fade-in-up space-y-8">
+            <div className="flex items-center gap-3 mb-8">
+              <div className="w-2 h-8 bg-gradient-to-b from-primary to-primary/60 rounded-full"></div>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">{title}</h1>
+            </div>
             {children}
           </div>
         </main>
