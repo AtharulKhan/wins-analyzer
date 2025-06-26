@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useProjectIdeasData, SortByType } from './useProjectIdeasData';
 import { Button } from "@/components/ui/button";
@@ -22,8 +23,40 @@ import {
   TableCaption,
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const SUMMARY_CHAR_LIMIT = 100;
+
+// Color schemes for different categories
+const getCategoryBadgeColor = (category: string, index: number) => {
+  const colors = [
+    'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-sm',
+    'bg-gradient-to-r from-emerald-500 to-green-600 text-white shadow-sm',
+    'bg-gradient-to-r from-purple-500 to-violet-600 text-white shadow-sm',
+    'bg-gradient-to-r from-amber-500 to-yellow-600 text-white shadow-sm',
+    'bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-sm',
+    'bg-gradient-to-r from-cyan-500 to-teal-600 text-white shadow-sm',
+    'bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-sm',
+    'bg-gradient-to-r from-lime-500 to-green-600 text-white shadow-sm'
+  ];
+  return colors[index % colors.length];
+};
+
+const getRowBackgroundColor = (index: number) => {
+  const colors = [
+    'hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-indigo-50/30',
+    'hover:bg-gradient-to-r hover:from-emerald-50/50 hover:to-green-50/30',
+    'hover:bg-gradient-to-r hover:from-purple-50/50 hover:to-violet-50/30',
+    'hover:bg-gradient-to-r hover:from-amber-50/50 hover:to-yellow-50/30',
+    'hover:bg-gradient-to-r hover:from-rose-50/50 hover:to-pink-50/30',
+    'hover:bg-gradient-to-r hover:from-cyan-50/50 hover:to-teal-50/30',
+    'hover:bg-gradient-to-r hover:from-orange-50/50 hover:to-red-50/30',
+    'hover:bg-gradient-to-r hover:from-lime-50/50 hover:to-green-50/30'
+  ];
+  return colors[index % colors.length];
+};
 
 const ProjectIdeasTracker: React.FC = () => {
   const { 
@@ -70,149 +103,189 @@ const ProjectIdeasTracker: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto py-4 space-y-4">
-      {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-2 p-2 border rounded-md bg-card">
-        {/* Search Input */}
-        <div className="relative w-full sm:w-64">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search title, category, summary..."
-            className="pl-8 w-full h-9"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
+    <div className="container mx-auto py-6 space-y-6 animate-fade-in-up">
+      {/* Header Card */}
+      <Card className="bg-gradient-to-br from-white via-slate-50/30 to-blue-50/20 backdrop-blur-sm border-0 shadow-xl rounded-2xl overflow-hidden">
+        <CardHeader className="bg-gradient-to-r from-slate-100 via-blue-50 to-indigo-100/80 border-b border-slate-200/60 backdrop-blur-sm">
+          <CardTitle className="text-2xl font-bold text-slate-800 flex items-center gap-3">
+            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+              <Search className="h-4 w-4 text-white" />
+            </div>
+            Project Ideas Tracker
+          </CardTitle>
+        </CardHeader>
+        
+        {/* Toolbar */}
+        <CardContent className="p-6">
+          <div className="flex flex-wrap items-center gap-4">
+            {/* Search Input */}
+            <div className="relative flex-1 min-w-64">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Search title, category, summary..."
+                className="pl-10 h-10 bg-white border-slate-200 focus:border-blue-400 focus:ring-blue-400/20 shadow-sm"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
 
-        {/* Category Filter */}
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-muted-foreground">Category:</span>
-          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger className="w-full sm:w-[180px] h-9">
-              <SelectValue placeholder="Category" />
-            </SelectTrigger>
-            <SelectContent>
-              {allCategories.map(category => (
-                <SelectItem key={category} value={category}>
-                  {category}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+            {/* Category Filter */}
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-slate-600">Category:</span>
+              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                <SelectTrigger className="w-[180px] h-10 bg-white border-slate-200 shadow-sm">
+                  <SelectValue placeholder="Category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {allCategories.map(category => (
+                    <SelectItem key={category} value={category}>
+                      {category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-        {/* Sort By Field */}
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-muted-foreground">Sort by:</span>
-          <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortByType)}>
-            <SelectTrigger className="w-[150px] h-9">
-              <SelectValue placeholder="Sort by field" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="title">Project Title</SelectItem>
-              <SelectItem value="category">Category</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+            {/* Sort By Field */}
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-slate-600">Sort by:</span>
+              <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortByType)}>
+                <SelectTrigger className="w-[150px] h-10 bg-white border-slate-200 shadow-sm">
+                  <SelectValue placeholder="Sort by field" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="title">Project Title</SelectItem>
+                  <SelectItem value="category">Category</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-        {/* Sort Order Toggle */}
-        <Button 
-          variant="outline" 
-          size="icon" 
-          className="h-9 w-9"
-          onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
-          title={`Sort order: ${sortOrder === 'asc' ? 'Ascending' : 'Descending'}`}
-        >
-          {sortBy === 'title' ? (
-            sortOrder === 'asc' ? <ArrowUpAZ className="h-4 w-4" /> : <ArrowDownAZ className="h-4 w-4" />
-          ) : ( // category or other fields
-            sortOrder === 'asc' ? <ArrowUpNarrowWide className="h-4 w-4" /> : <ArrowDownNarrowWide className="h-4 w-4" />
-          )}
-        </Button>
+            {/* Sort Order Toggle */}
+            <Button 
+              variant="outline" 
+              size="icon" 
+              className="h-10 w-10 bg-white border-slate-200 shadow-sm hover:bg-slate-50"
+              onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
+              title={`Sort order: ${sortOrder === 'asc' ? 'Ascending' : 'Descending'}`}
+            >
+              {sortBy === 'title' ? (
+                sortOrder === 'asc' ? <ArrowUpAZ className="h-4 w-4" /> : <ArrowDownAZ className="h-4 w-4" />
+              ) : (
+                sortOrder === 'asc' ? <ArrowUpNarrowWide className="h-4 w-4" /> : <ArrowDownNarrowWide className="h-4 w-4" />
+              )}
+            </Button>
 
-        {/* Refresh Button */}
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={fetchProjectIdeas} 
-          disabled={loading}
-          className="ml-auto h-9"
-        >
-          <RefreshCw className={cn("h-4 w-4", loading && "animate-spin mr-0", !loading && "mr-2")} />
-          {!loading && "Refresh Data"}
-        </Button>
-      </div>
+            {/* Refresh Button */}
+            <Button 
+              variant="outline" 
+              onClick={fetchProjectIdeas} 
+              disabled={loading}
+              className="h-10 bg-white border-slate-200 shadow-sm hover:bg-slate-50"
+            >
+              <RefreshCw className={cn("h-4 w-4", loading && "animate-spin mr-0", !loading && "mr-2")} />
+              {!loading && "Refresh"}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
-      <Table>
-        <TableCaption>A list of your project ideas. {projectIdeas.length === 0 && !loading && "Add some from your Google Sheet!"}</TableCaption>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[30%]">Project Title</TableHead>
-            <TableHead className="w-[20%]">Project Category</TableHead>
-            <TableHead>Quick Summary</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {projectIdeas.length === 0 && !loading ? (
-            <TableRow>
-              <TableCell colSpan={3} className="h-24 text-center">
-                No project ideas found. Try adjusting your filters or refresh.
-              </TableCell>
-            </TableRow>
-          ) : (
-            projectIdeas.map((idea, index) => {
-              const isExpanded = expandedSummaries[index];
-              const isLongSummary = idea.summary.length > SUMMARY_CHAR_LIMIT;
+      {/* Table Card */}
+      <Card className="bg-gradient-to-br from-white via-slate-50/30 to-blue-50/20 backdrop-blur-sm border-0 shadow-xl rounded-2xl overflow-hidden">
+        <CardContent className="p-0">
+          <div className="overflow-hidden rounded-2xl">
+            {/* Table Header */}
+            <div className="bg-gradient-to-r from-slate-100 via-blue-50 to-indigo-100/80 border-b border-slate-200/60 px-6 py-4 backdrop-blur-sm">
+              <div className="grid grid-cols-3 gap-6 text-sm font-bold text-slate-700 uppercase tracking-wider">
+                <div className="text-indigo-700">Project Title</div>
+                <div className="text-emerald-700">Category</div>
+                <div className="text-purple-700">Summary</div>
+              </div>
+            </div>
 
-              return (
-                <TableRow key={index}>
-                  <TableCell className="font-medium align-top">{idea.title}</TableCell>
-                  <TableCell className="align-top">{idea.category}</TableCell>
-                  <TableCell className="align-top">
-                    {isLongSummary ? (
-                      <Collapsible open={isExpanded} onOpenChange={() => toggleSummary(index)}>
-                        <div className="flex flex-col items-start">
-                          <span className={cn(!isExpanded && "text-muted-foreground")}>
-                            {isExpanded ? idea.summary : `${idea.summary.substring(0, SUMMARY_CHAR_LIMIT)}...`}
-                          </span>
-                          <CollapsibleTrigger asChild>
-                            <Button variant="link" size="sm" className="p-0 h-auto mt-1 text-xs">
-                              {isExpanded ? (
-                                <>
-                                  Read less <ChevronUp className="h-3 w-3 ml-1" />
-                                </>
-                              ) : (
-                                <>
-                                  Read more <ChevronDown className="h-3 w-3 ml-1" />
-                                </>
-                              )}
-                            </Button>
-                          </CollapsibleTrigger>
+            {/* Table Body */}
+            <div className="divide-y divide-slate-200/50">
+              {projectIdeas.length === 0 && !loading ? (
+                <div className="p-16 text-center bg-gradient-to-br from-slate-50 to-blue-50/30">
+                  <div className="text-slate-500 text-xl mb-3 font-semibold">No project ideas found</div>
+                  <div className="text-slate-400 text-sm">Try adjusting your filters or adding new project ideas to your Google Sheet.</div>
+                </div>
+              ) : (
+                projectIdeas.map((idea, index) => {
+                  const isExpanded = expandedSummaries[index];
+                  const isLongSummary = idea.summary.length > SUMMARY_CHAR_LIMIT;
+
+                  return (
+                    <div 
+                      key={index} 
+                      className={cn(
+                        "px-6 py-5 grid grid-cols-3 gap-6 items-start group transition-all duration-300 hover:shadow-lg hover:scale-[1.01]",
+                        getRowBackgroundColor(index),
+                        "animate-slide-up"
+                      )}
+                      style={{ animationDelay: `${index * 100}ms` }}
+                    >
+                      {/* Project Title */}
+                      <div className="space-y-2">
+                        <div className="font-bold text-slate-800 text-base leading-tight group-hover:text-slate-900 transition-colors">
+                          {idea.title}
                         </div>
-                        <CollapsibleContent>
-                          {/* The full summary is already rendered above when expanded,
-                              so this content area can be minimal or not strictly needed
-                              if the trigger itself shows/hides the text directly.
-                              However, using CollapsibleContent is good for semantics and animations.
-                              For this setup, we are showing the full summary text directly
-                              when isExpanded is true, so this content block isn't strictly
-                              necessary to re-render the text, but it's part of the pattern.
-                              If the summary were very long, one might put the full text
-                              only in the CollapsibleContent.
-                          */}
-                        </CollapsibleContent>
-                      </Collapsible>
-                    ) : (
-                      <p>{idea.summary}</p>
-                    )}
-                  </TableCell>
-                </TableRow>
-              );
-            })
-          )}
-        </TableBody>
-      </Table>
+                      </div>
+                      
+                      {/* Category */}
+                      <div>
+                        <Badge 
+                          className={cn(
+                            "text-sm font-semibold border-0 transition-all duration-200 hover:scale-105 shadow-md",
+                            getCategoryBadgeColor(idea.category, index)
+                          )}
+                        >
+                          {idea.category}
+                        </Badge>
+                      </div>
+                      
+                      {/* Summary */}
+                      <div>
+                        {isLongSummary ? (
+                          <Collapsible open={isExpanded} onOpenChange={() => toggleSummary(index)}>
+                            <div className="space-y-2">
+                              <div className="text-slate-700 text-sm leading-relaxed">
+                                {isExpanded ? idea.summary : `${idea.summary.substring(0, SUMMARY_CHAR_LIMIT)}...`}
+                              </div>
+                              <CollapsibleTrigger asChild>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  className="p-0 h-auto text-xs text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-full px-2 py-1 transition-all duration-200"
+                                >
+                                  {isExpanded ? (
+                                    <>
+                                      <ChevronUp className="h-3 w-3 mr-1" />
+                                      Show Less
+                                    </>
+                                  ) : (
+                                    <>
+                                      <ChevronDown className="h-3 w-3 mr-1" />
+                                      Read More
+                                    </>
+                                  )}
+                                </Button>
+                              </CollapsibleTrigger>
+                            </div>
+                            <CollapsibleContent />
+                          </Collapsible>
+                        ) : (
+                          <div className="text-slate-700 text-sm leading-relaxed">{idea.summary}</div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
