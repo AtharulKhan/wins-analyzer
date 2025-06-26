@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Win } from './types';
@@ -116,12 +115,11 @@ export function CategoryBreakdown({ breakdown }: CategoryBreakdownProps) {
               </div>
               <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
                 <div 
-                  className="bg-gradient-to-r from-emerald-400 to-emerald-500 h-2 rounded-full transition-all duration-700 ease-out transform origin-left"
+                  className="bg-gradient-to-r from-emerald-400 to-emerald-500 h-2 rounded-full animate-progress"
                   style={{ 
-                    width: `${percentage}%`,
-                    transform: 'scaleX(0)',
-                    animation: `scaleX 0.8s ease-out ${index * 100 + 300}ms forwards`
-                  }}
+                    '--progress-width': `${percentage}%`,
+                    animationDelay: `${index * 150 + 300}ms`
+                  } as React.CSSProperties}
                 ></div>
               </div>
             </div>
@@ -181,12 +179,11 @@ export function SubCategoryBreakdown({ breakdown }: SubCategoryBreakdownProps) {
               </div>
               <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
                 <div 
-                  className="bg-gradient-to-r from-violet-400 to-violet-500 h-2 rounded-full transition-all duration-700 ease-out transform origin-left"
+                  className="bg-gradient-to-r from-violet-400 to-violet-500 h-2 rounded-full animate-progress"
                   style={{ 
-                    width: `${percentage}%`,
-                    transform: 'scaleX(0)',
-                    animation: `scaleX 0.8s ease-out ${index * 100 + 500}ms forwards`
-                  }}
+                    '--progress-width': `${percentage}%`,
+                    animationDelay: `${index * 150 + 500}ms`
+                  } as React.CSSProperties}
                 ></div>
               </div>
             </div>
