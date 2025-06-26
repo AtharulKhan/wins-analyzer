@@ -6,7 +6,6 @@ import { PageLayout } from '@/components/layout/PageLayout';
 import { useDashboardData } from '@/components/dashboard/useDashboardData';
 import { useCategoryData } from '@/components/dashboard/useCategoryData';
 import { useTimeSeriesData } from '@/components/dashboard/useTimeSeriesData';
-import { useKeywordData } from '@/components/dashboard/useKeywordData';
 
 // Import components
 import { StatsOverview } from '@/components/dashboard/StatsOverview';
@@ -14,7 +13,6 @@ import { ActivityTimeline } from '@/components/dashboard/ActivityTimeline';
 import { CategoryBubbleChart } from '@/components/dashboard/CategoryBubbleChart';
 import { TimeSeriesChart } from '@/components/dashboard/TimeSeriesChart';
 import { CumulativeChart } from '@/components/dashboard/CumulativeChart';
-import { ThemeCloud } from '@/components/dashboard/ThemeCloud';
 import { CategoryWinsDialog } from '@/components/dashboard/CategoryWinsDialog';
 import { ExportButton } from '@/components/dashboard/ExportButton';
 
@@ -32,7 +30,6 @@ const DashboardView = () => {
     zAxisDomain
   } = useCategoryData(activeWins);
   const { winsByPeriod, timeSeriesData, cumulativeWinsData } = useTimeSeriesData(activeWins);
-  const { commonKeywords } = useKeywordData(activeWins);
 
   // Chart configuration
   const chartConfig = {
@@ -79,11 +76,6 @@ const DashboardView = () => {
 
         <div className="md:col-span-2 lg:col-span-2">
           <CumulativeChart cumulativeWinsData={cumulativeWinsData} chartConfig={chartConfig} />
-        </div>
-
-        {/* Theme Cloud - Full Width */}
-        <div className="md:col-span-2 lg:col-span-4">
-          <ThemeCloud commonKeywords={commonKeywords} />
         </div>
 
         {/* Export Button - Full Width */}
