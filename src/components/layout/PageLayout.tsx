@@ -59,9 +59,9 @@ export function PageLayout({ children, title }: PageLayoutProps) {
         )}
         
         <main className="flex-1 transition-all duration-300 relative">
-          {/* Mobile menu button positioned at top-left when navbar is removed */}
+          {/* Mobile menu button positioned at top-right when navbar is removed */}
           {isMobile && (
-            <div className="absolute top-4 left-4 z-10">
+            <div className="absolute top-4 right-4 z-10">
               <Button 
                 variant="ghost" 
                 size="icon" 
