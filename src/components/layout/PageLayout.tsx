@@ -6,6 +6,7 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { InstallPrompt } from '@/components/pwa/InstallPrompt';
 
 interface PageLayoutProps {
   children: React.ReactNode;
@@ -82,6 +83,9 @@ export function PageLayout({ children, title }: PageLayoutProps) {
           </div>
         </main>
       </div>
+      
+      {/* PWA Install Prompt */}
+      <InstallPrompt />
     </div>
   );
 }
