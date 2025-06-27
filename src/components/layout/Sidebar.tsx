@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { 
   ChevronRight, ChevronLeft, 
-  LayoutList, BarChart, Settings
+  LayoutList, BarChart
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -18,7 +17,7 @@ interface SidebarProps {
 export function Sidebar({ isCollapsed, onToggle, className }: SidebarProps) {
   const location = useLocation();
   
-  // Navigation items for the wins tracker app
+  // Navigation items for the wins tracker app (removed Settings)
   const navItems = [
     {
       title: 'Finished Projects',
@@ -43,14 +42,6 @@ export function Sidebar({ isCollapsed, onToggle, className }: SidebarProps) {
       gradient: 'from-orange-500 to-red-600',
       bgGradient: 'from-orange-50 to-red-50',
       darkBgGradient: 'dark:from-orange-950/20 dark:to-red-950/20'
-    },
-    {
-      title: 'Settings',
-      icon: Settings,
-      href: '/settings',
-      gradient: 'from-gray-500 to-slate-600',
-      bgGradient: 'from-gray-50 to-slate-50',
-      darkBgGradient: 'dark:from-gray-950/20 dark:to-slate-950/20'
     }
   ];
 
