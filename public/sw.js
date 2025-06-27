@@ -1,12 +1,10 @@
 
-const CACHE_NAME = 'wins-tracker-v3';
-const STATIC_CACHE = 'wins-tracker-static-v3';
-const RUNTIME_CACHE = 'wins-tracker-runtime-v3';
+const CACHE_NAME = 'wins-tracker-v4';
+const STATIC_CACHE = 'wins-tracker-static-v4';
+const RUNTIME_CACHE = 'wins-tracker-runtime-v4';
 
 const urlsToCache = [
   '/',
-  '/static/js/bundle.js',
-  '/static/css/main.css',
   '/manifest.json'
 ];
 
@@ -21,8 +19,8 @@ self.addEventListener('install', function(event) {
         return cache.addAll(urlsToCache);
       })
       .then(function() {
-        // Skip waiting to activate immediately
-        return self.skipWaiting();
+        // Don't skip waiting automatically - let the user decide
+        console.log('Service Worker installed, waiting for activation');
       })
       .catch(function(error) {
         console.error('Cache installation failed:', error);
@@ -58,8 +56,11 @@ self.addEventListener('fetch', function(event) {
   const request = event.request;
   const url = new URL(request.url);
   
-  // Skip caching for API requests and external domains
-  if (url.pathname.startsWith('/api/') || url.origin !== location.origin) {
+  // Skip caching for API requests, external domains, and node_modules
+  if (url.pathname.startsWith('/api/') || 
+      url.pathname.includes('/node_modules/') ||
+      url.pathname.includes('?v=') ||
+      url.origin !== location.origin) {
     event.respondWith(fetch(request));
     return;
   }
@@ -94,11 +95,29 @@ self.addEventListener('fetch', function(event) {
     return;
   }
   
-  // Cache-first strategy for static assets (JS, CSS, images)
-  if (request.destination === 'script' || 
-      request.destination === 'style' || 
-      request.destination === 'image' ||
-      request.destination === 'font') {
+  // For JavaScript and CSS files, use network-first to avoid module import issues
+  if (request.destination === 'script' || request.destination === 'style') {
+    event.respondWith(
+      fetch(request)
+        .then(function(response) {
+          if (response.status === 200) {
+            const responseClone = response.clone();
+            caches.open(STATIC_CACHE).then(function(cache) {
+              cache.put(request, responseClone);
+            });
+          }
+          return response;
+        })
+        .catch(function() {
+          // Only fallback to cache if network fails completely
+          return caches.match(request);
+        })
+    );
+    return;
+  }
+  
+  // Cache-first strategy for images and fonts
+  if (request.destination === 'image' || request.destination === 'font') {
     event.respondWith(
       caches.match(request)
         .then(function(cachedResponse) {

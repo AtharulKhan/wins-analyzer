@@ -25,20 +25,15 @@
   <body>
     <div id="root"></div>
     
-    <!-- Service Worker Registration with better update handling -->
+    <!-- Service Worker Registration with improved update handling -->
     <script>
       if ('serviceWorker' in navigator) {
+        let refreshing = false;
+        
         window.addEventListener('load', function() {
-          // Unregister existing service workers first
-          navigator.serviceWorker.getRegistrations().then(function(registrations) {
-            for(let registration of registrations) {
-              registration.unregister();
-            }
-          }).then(function() {
-            // Register the new service worker
-            return navigator.serviceWorker.register('/sw.js');
-          }).then(function(registration) {
-            console.log('SW registered: ', registration);
+          navigator.serviceWorker.register('/sw.js')
+          .then(function(registration) {
+            console.log('SW registered successfully:', registration);
             
             // Handle service worker updates
             registration.addEventListener('updatefound', function() {
@@ -48,9 +43,11 @@
               newWorker.addEventListener('statechange', function() {
                 if (newWorker.state === 'installed') {
                   if (navigator.serviceWorker.controller) {
-                    // New update available
-                    console.log('New content available, will refresh...');
-                    newWorker.postMessage({ type: 'SKIP_WAITING' });
+                    // New update available - show user notification instead of auto-reload
+                    console.log('New content available');
+                    if (!refreshing) {
+                      showUpdateNotification(newWorker);
+                    }
                   } else {
                     // Content is cached for first time
                     console.log('Content is now available offline!');
@@ -61,21 +58,56 @@
             
             // Handle controller change (when new SW takes over)
             navigator.serviceWorker.addEventListener('controllerchange', function() {
-              console.log('Service worker controller changed, reloading...');
-              window.location.reload();
+              if (!refreshing) {
+                refreshing = true;
+                console.log('Service worker controller changed, reloading...');
+                window.location.reload();
+              }
             });
             
           }).catch(function(registrationError) {
-            console.log('SW registration failed: ', registrationError);
+            console.log('SW registration failed:', registrationError);
+            // Don't block the app if SW registration fails
           });
         });
         
-        // Handle service worker messages
-        navigator.serviceWorker.addEventListener('message', function(event) {
-          if (event.data && event.data.type === 'RELOAD_PAGE') {
-            window.location.reload();
-          }
-        });
+        // Show update notification to user
+        function showUpdateNotification(newWorker) {
+          const updateBanner = document.createElement('div');
+          updateBanner.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #8B5CF6;
+            color: white;
+            padding: 16px;
+            text-align: center;
+            z-index: 9999;
+            font-family: system-ui, -apple-system, sans-serif;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+          `;
+          updateBanner.innerHTML = `
+            <div style="max-width: 600px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 16px;">
+              <span>A new version is available!</span>
+              <div>
+                <button onclick="updateApp()" style="background: white; color: #8B5CF6; border: none; padding: 8px 16px; border-radius: 4px; margin-right: 8px; cursor: pointer; font-weight: 500;">Update</button>
+                <button onclick="dismissUpdate()" style="background: transparent; color: white; border: 1px solid white; padding: 8px 16px; border-radius: 4px; cursor: pointer;">Later</button>
+              </div>
+            </div>
+          `;
+          
+          window.updateApp = function() {
+            newWorker.postMessage({ type: 'SKIP_WAITING' });
+            updateBanner.remove();
+          };
+          
+          window.dismissUpdate = function() {
+            updateBanner.remove();
+          };
+          
+          document.body.appendChild(updateBanner);
+        }
       }
     </script>
     
